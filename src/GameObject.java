@@ -53,6 +53,10 @@ public abstract class GameObject {
 		this.y += dy;
 	}
 	
+	public void setRotation(double angle) {
+		this.rotation = angle;
+	}
+	
 	public void rotate(double angle) {
 		this.rotation += angle;
 	}
