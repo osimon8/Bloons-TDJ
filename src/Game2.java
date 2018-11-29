@@ -23,7 +23,7 @@ public class Game2 implements Runnable {
         // Top-level frame in which game components live
         // Be sure to change "TOP LEVEL FRAME" to the name of your game
         final JFrame frame = new JFrame("Bloons TDJ");
-        frame.setResizable(false);
+        //frame.setResizable(false);
         frame.setLocation(800, 350);
         
         JPanel screen = new JPanel();
@@ -76,6 +76,8 @@ public class Game2 implements Runnable {
             public void actionPerformed(ActionEvent e) {
             	changeScreen(frame, screen, in_game);
             	in_game.reset();
+                //PathTraceUtility tracer = new PathTraceUtility(screen, "spinny");
+                //tracer.init();
             }
         });
         main_menu.add(play_button);
@@ -87,6 +89,7 @@ public class Game2 implements Runnable {
         screen.add(main_menu);
         
         frame.add(screen);
+        
         
         // Status panel
 //        final JPanel status_panel = new JPanel();

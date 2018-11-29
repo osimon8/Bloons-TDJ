@@ -73,16 +73,20 @@ public abstract class GameObject {
 	public void draw(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		
+		
+		int w = img.getWidth(null);
+		int h = img.getHeight(null);
+		
 		  //Make a backup so that we can reset our graphics object after using it.
 	    AffineTransform backup = g2d.getTransform();
 	    //rx is the x coordinate for rotation, ry is the y coordinate for rotation, and angle
 	    //is the angle to rotate the image. If you want to rotate around the center of an image,
 	    //use the image's center x and y coordinates for rx and ry.
-	    AffineTransform a = AffineTransform.getRotateInstance(rotation * Math.PI / 180, x + img.getWidth(null) / 2, y + img.getHeight(null) / 2);
+	    AffineTransform a = AffineTransform.getRotateInstance(rotation * Math.PI / 180, x, y);
 	    //Set our Graphics2D object to the transform
 	    g2d.setTransform(a);
 	    //Draw our image like normal
-	    g2d.drawImage(img, (int)x, (int)y, null);
+	    g2d.drawImage(img, (int)(x - w / 2.0), (int)(y - h / 2.0) , null);
 	    //Reset our graphics object so we can draw with it again.
 	    g2d.setTransform(backup);
 	}

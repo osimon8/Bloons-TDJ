@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,6 +32,8 @@ public class GameCourt2 extends JPanel {
 	private int lives = 100;
 	private int money = 1000;
 	private List<Projectile> projectiles;
+	private List<Balloon> balloons;
+	private List<List> gameObjects;
 
     public boolean playing = false; // whether the game is running 
     private Image background;
@@ -46,6 +49,8 @@ public class GameCourt2 extends JPanel {
     
     public static final int INTERVAL = 16;
 
+    private static long lastTime = 0;
+    
     public GameCourt2() {
         // creates border around the court area, JComponent method
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -113,12 +118,22 @@ public class GameCourt2 extends JPanel {
             System.out.println("Internal Error:" + e.getMessage());
         }
         
+        gameObjects = new LinkedList<>();
         projectiles = new LinkedList<>();
+        balloons = new LinkedList<>();
         
-        Projectile Dart = new TargetedProjectile(Game2.loadImage(Projectile.DART).getScaledInstance(40, 10, 0), 100, 100, 160, 200, 200);
         
-        projectiles.add(Dart);
+        gameObjects.add(projectiles);
+        gameObjects.add(balloons);
+        
+
+        
+        Projectile dart = new TargetedProjectile(Game2.loadImage(Projectile.DART).getScaledInstance(40, 10, 0), 100, 100, 160, 200, 200);
+        
+        projectiles.add(dart);
     
+        
+
 
 
     }
@@ -128,13 +143,25 @@ public class GameCourt2 extends JPanel {
      */
     public void reset() {
 
-
+    	
         playing = true;
         //status.setText("Running...");
 
         // Make sure that this component has the keyboard focus
         requestFocusInWindow();
-        startTime = System.currentTimeMillis();
+        lastTime = System.currentTimeMillis();
+        
+        
+        
+        try {
+			Point[] path = DataLoader.readPathData("spinny");
+	        Balloon b = new Balloon(Game2.loadImage(Projectile.DART).getScaledInstance(40, 10, 0), 100, 100, 5, path);
+	        balloons.add(b);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("file isn't here fam");
+		}
+        
     }
 
     /**
@@ -160,21 +187,27 @@ public class GameCourt2 extends JPanel {
 //                //status.setText("You win!");
 //            }
             
-        	List<Projectile> deaths = new LinkedList<>();
+        	List<GameObject> deaths = new LinkedList<>();
         	
-            for (Projectile p : projectiles) {
-            	p.update(INTERVAL);
-            	if (!p.alive()) {
-            		deaths.add(p);
+            for (Collection<GameObject> li  : gameObjects) {
+            	for (GameObject o : li) {
+	            	//o.update(INTERVAL);
+            		o.update((int)(System.currentTimeMillis() - lastTime));
+	            	if (!o.alive()) {
+	            		deaths.add(o);
+	            		}
             	}
             }
             
-            for (Projectile p : deaths) {
-            	projectiles.remove(p);
+            for (GameObject o : deaths) {
+            	projectiles.remove(o);
+            	balloons.remove(o);
             }
 
+            
             // update the display
             repaint();
+            lastTime = System.currentTimeMillis();
             //System.out.println(System.currentTimeMillis() - startTime);
         }
     }
@@ -183,8 +216,10 @@ public class GameCourt2 extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(background, 0, 0, null);
-        for (Projectile p : projectiles) {
-        	p.draw(g);
+        for (Collection<GameObject> li  : gameObjects) {
+        	for (GameObject o : li) {
+        		o.draw(g);
+        	}
         }
     }
          

@@ -1,0 +1,27 @@
+<SpriteInformation>
+<FrameInformation name="shop_towers" texw="512" texh="508" type="png">
+<Cell name="apprentice_avatar_small" x="457" y="312" w="53" h="99" ax="0" ay="0" aw="53" ah="99"/>
+<Cell name="banana_farm_avatar_small" x="202" y="203" w="92" h="111" ax="0" ay="0" aw="92" ah="111"/>
+<Cell name="bloonchipper_avatar_small" x="296" y="303" w="87" h="94" ax="0" ay="0" aw="87" ah="94"/>
+<Cell name="bomb_avatar_small" x="226" y="106" w="104" h="95" ax="0" ay="0" aw="104" ah="95"/>
+<Cell name="boomerang_avatar_small" x="388" y="206" w="87" h="104" ax="0" ay="0" aw="87" ah="104"/>
+<Cell name="buccaneer_avatar_small" x="296" y="206" w="90" h="95" ax="0" ay="0" aw="90" ah="95"/>
+<Cell name="cobra_avatar_small" x="433" y="88" w="62" h="95" ax="0" ay="0" aw="62" ah="95"/>
+<Cell name="dart_monkey_avatar_small" x="1" y="192" w="99" h="96" ax="0" ay="0" aw="99" ah="96"/>
+<Cell name="dartling_gun_avatar_small" x="353" y="1" w="101" h="85" ax="0" ay="0" aw="101" ah="85"/>
+<Cell name="engineer_avatar_small" x="385" y="312" w="70" h="104" ax="0" ay="0" aw="70" ah="104"/>
+<Cell name="farmer_avatar_small" x="1" y="290" w="98" h="104" ax="0" ay="0" aw="98" ah="104"/>
+<Cell name="glue_gunner_avatar_small" x="200" y="316" w="90" h="102" ax="0" ay="0" aw="90" ah="102"/>
+<Cell name="heli_avatar_basic_small" x="1" y="1" w="124" h="81" ax="0" ay="0" aw="124" ah="81"/>
+<Cell name="ice_avatar_small" x="292" y="399" w="77" h="108" ax="0" ay="0" aw="77" ah="108"/>
+<Cell name="monkey_ace_avatar_small" x="246" y="1" w="105" h="103" ax="0" ay="0" aw="105" ah="103"/>
+<Cell name="monkeysub_avatar_small" x="127" y="1" w="117" h="77" ax="0" ay="0" aw="117" ah="77"/>
+<Cell name="mortar_avatar_small" x="1" y="84" w="112" h="106" ax="0" ay="0" aw="112" ah="106"/>
+<Cell name="ninja_avatar_small" x="332" y="106" w="99" h="98" ax="0" ay="0" aw="99" ah="98"/>
+<Cell name="sniper_avatar_small" x="102" y="192" w="98" h="99" ax="0" ay="0" aw="98" ah="99"/>
+<Cell name="spike_factory_avatar_small" x="97" y="398" w="92" h="83" ax="0" ay="0" aw="92" ah="83"/>
+<Cell name="supermonkey_avatar_small" x="115" y="84" w="109" h="102" ax="0" ay="0" aw="109" ah="102"/>
+<Cell name="tack_shooter_avatar_small" x="1" y="396" w="94" h="98" ax="0" ay="0" aw="94" ah="98"/>
+<Cell name="village_avatar_small" x="101" y="293" w="97" h="103" ax="0" ay="0" aw="97" ah="103"/>
+</FrameInformation>
+</SpriteInformation>

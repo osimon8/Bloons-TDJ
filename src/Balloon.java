@@ -39,11 +39,11 @@ public class Balloon extends GameObject {
 			return;
 		}
 		
-		double dist = time * speedScale / 1000 * hp;
+		double dist = time * speedScale / 1000.0 * hp;
 		
 		while (dist > 0 && pathPosition < path.length - 1) {
 			Point p = path[pathPosition + 1];
-			move(p.getX(), p.getY());
+			move(p.x, p.y);
 			dist -= p.distance(path[pathPosition]);
 			pathPosition++;
 		}
@@ -53,6 +53,7 @@ public class Balloon extends GameObject {
 			flagForDeath();
 		}
 		
+
 		
 		// TODO Auto-generated method stub
 
