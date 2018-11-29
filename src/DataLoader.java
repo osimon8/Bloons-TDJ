@@ -1,5 +1,6 @@
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -154,7 +155,7 @@ public class DataLoader {
                 	// <Cell name="submarine_gun_01" x="679" y="999" w="7" h="15" ax="1" ay="1" aw="8" ah="16"/>
                 	int[] temp = new int[8];
                 	for (int i = 1; i <= 8; i ++)
-                		temp[i] = Integer.parseInt(streamReader.getAttributeValue(i));
+                		temp[i - 1] = Integer.parseInt(streamReader.getAttributeValue(i));
                 	data.put(streamReader.getAttributeValue(0), temp);
                     break;
                 }
@@ -170,7 +171,7 @@ public class DataLoader {
 	}
 	
 	
-    public static Image loadImage(String path){
+    public static BufferedImage loadImage(String path){
         try {
         	return ImageIO.read(new File(path));
         } 

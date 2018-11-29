@@ -34,6 +34,7 @@ public class GameCourt2 extends JPanel {
 	private List<Projectile> projectiles;
 	private List<Balloon> balloons;
 	private List<List> gameObjects;
+	private ResourceManager res;
 
     public boolean playing = false; // whether the game is running 
     private Image background;
@@ -132,7 +133,7 @@ public class GameCourt2 extends JPanel {
         
         projectiles.add(dart);
     
-        
+        res = new ResourceManager();
 
 
 
@@ -155,7 +156,11 @@ public class GameCourt2 extends JPanel {
         
         try {
 			Point[] path = DataLoader.readPathData("spinny");
-	        Balloon b = new Balloon(DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0), 100, 100, 5, path);
+			//Image img = DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0);
+			Image img = res.getImage("stock_bloon");
+			
+			
+	        Balloon b = new Balloon(img, 100, 100, 5, path);
 	        balloons.add(b);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
