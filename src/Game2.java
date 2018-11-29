@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * Game Main class that specifies the frame and widgets of the GUI
@@ -82,9 +83,7 @@ public class Game2 implements Runnable {
         });
         main_menu.add(play_button);
         instructions.add(play_button);
-        
-        
-
+       
         
         screen.add(main_menu);
         
@@ -136,14 +135,6 @@ public class Game2 implements Runnable {
     }
 
     
-    public static Image loadImage(String path){
-        try {
-        	return ImageIO.read(new File(path));
-        } 
-        catch (IOException e) {
-            return null;
-        }
-    }
     
     /**
      * Main method run to start and run the game. Initializes the GUI elements specified in Game and

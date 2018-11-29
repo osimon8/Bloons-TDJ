@@ -128,7 +128,7 @@ public class GameCourt2 extends JPanel {
         
 
         
-        Projectile dart = new TargetedProjectile(Game2.loadImage(Projectile.DART).getScaledInstance(40, 10, 0), 100, 100, 160, 200, 200);
+        Projectile dart = new TargetedProjectile(DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0), 100, 100, 160, 200, 200);
         
         projectiles.add(dart);
     
@@ -155,7 +155,7 @@ public class GameCourt2 extends JPanel {
         
         try {
 			Point[] path = DataLoader.readPathData("spinny");
-	        Balloon b = new Balloon(Game2.loadImage(Projectile.DART).getScaledInstance(40, 10, 0), 100, 100, 5, path);
+	        Balloon b = new Balloon(DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0), 100, 100, 5, path);
 	        balloons.add(b);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

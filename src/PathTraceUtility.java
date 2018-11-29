@@ -3,17 +3,13 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class PathTraceUtility {
@@ -83,7 +79,6 @@ public class PathTraceUtility {
 		File f = new File("files/data/levels/" + filename + "/" + filename + "PATH.dat");
 		try {
 			f.createNewFile();
-    		//BufferedReader r = new BufferedReader(new FileReader(f));
 			Writer w = new FileWriter(f);
 			//w.write("------PATH DATA START------");
 			w.write(data.size() + "\n");
