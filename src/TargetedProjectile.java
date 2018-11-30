@@ -1,4 +1,5 @@
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 public class TargetedProjectile extends Projectile {
 
@@ -20,7 +21,7 @@ public class TargetedProjectile extends Projectile {
 	private double targetX;
 	private double targetY;
 	
-	public TargetedProjectile(Image img, double x, double y, int speed, double targetX, double targetY) {
+	public TargetedProjectile(BufferedImage img, double x, double y, int speed, double targetX, double targetY) {
 		super(img, x, y);
 		double dx = targetX - x;
 		double dy = targetY - y;

@@ -6,11 +6,14 @@
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -25,16 +28,14 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class GameCourt2 extends JPanel {
 
-    private Square square; // the Black Square, keyboard control
-    private Circle snitch; // the Golden Snitch, bounces
-    private Poison poison; // the Poison Mushroom, doesn't move
 	
 	private int lives = 100;
 	private int money = 1000;
 	private List<Projectile> projectiles;
-	private List<Balloon> balloons;
-	private List<List> gameObjects;
+	private volatile Set<Balloon> balloons;
+	private List<Collection> gameObjects;
 	private ResourceManager res;
+	private Point[] bloonPath;
 
     public boolean playing = false; // whether the game is running 
     private Image background;
@@ -48,7 +49,7 @@ public class GameCourt2 extends JPanel {
     // Update interval for timer, in milliseconds
     
     
-    public static final int INTERVAL = 16;
+    public static final int INTERVAL = 16 ;
 
     private static long lastTime = 0;
     
@@ -76,24 +77,24 @@ public class GameCourt2 extends JPanel {
         // This key listener allows the square to move as long as an arrow key is pressed, by
         // changing the square's velocity accordingly. (The tick method below actually moves the
         // square.)
-        addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    square.setVx(-SQUARE_VELOCITY);
-                } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    square.setVx(SQUARE_VELOCITY);
-                } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    square.setVy(SQUARE_VELOCITY);
-                } else if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    square.setVy(-SQUARE_VELOCITY);
-                }
-            }
-
-            public void keyReleased(KeyEvent e) {
-                square.setVx(0);
-                square.setVy(0);
-            }
-        });
+//        addKeyListener(new KeyAdapter() {
+//            public void keyPressed(KeyEvent e) {
+//                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+//                    square.setVx(-SQUARE_VELOCITY);
+//                } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+//                    square.setVx(SQUARE_VELOCITY);
+//                } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+//                    square.setVy(SQUARE_VELOCITY);
+//                } else if (e.getKeyCode() == KeyEvent.VK_UP) {
+//                    square.setVy(-SQUARE_VELOCITY);
+//                }
+//            }
+//
+//            public void keyReleased(KeyEvent e) {
+//                square.setVx(0);
+//                square.setVy(0);
+//            }
+//        });
         
         Image img = null;
         
@@ -119,17 +120,26 @@ public class GameCourt2 extends JPanel {
             System.out.println("Internal Error:" + e.getMessage());
         }
         
+        try {
+			bloonPath = DataLoader.readPathData("spinny");
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        
         gameObjects = new LinkedList<>();
         projectiles = new LinkedList<>();
-        balloons = new LinkedList<>();
+        balloons = new TreeSet<>();
         
         
         gameObjects.add(projectiles);
         gameObjects.add(balloons);
         
-
         
-        Projectile dart = new TargetedProjectile(DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0), 100, 100, 160, 200, 200);
+        BufferedImage dartImage = DataLoader.loadImage(Projectile.DART);
+        dartImage = ResourceManager.resizeImage(dartImage, 40, 10);
+
+        Projectile dart = new TargetedProjectile(dartImage, 100, 100, 160, 200, 200);
         
         projectiles.add(dart);
     
@@ -152,20 +162,22 @@ public class GameCourt2 extends JPanel {
         requestFocusInWindow();
         lastTime = System.currentTimeMillis();
         
+
         
-        
-        try {
-			Point[] path = DataLoader.readPathData("spinny");
-			//Image img = DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0);
-			Image img = res.getImage("stock_bloon");
-			
-			
-	        Balloon b = new Balloon(img, 100, 100, 5, path);
-	        balloons.add(b);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			System.out.println("file isn't here fam");
-		}
+        Timer timer = new Timer(1000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	System.out.println("tick");
+                int hp = (int) (Math.random() * 5 + 1);
+
+        			//Image img = DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0);
+                BufferedImage img = res.getImage("stock_bloon");
+                System.out.println(img);
+        	    Balloon b = new Balloon(img, 100, 100, hp, bloonPath);
+        	    balloons.add(b);
+
+            }
+        });
+        timer.start();
         
     }
 
@@ -194,19 +206,42 @@ public class GameCourt2 extends JPanel {
             
         	List<GameObject> deaths = new LinkedList<>();
         	
-            for (Collection<GameObject> li  : gameObjects) {
-            	for (GameObject o : li) {
-	            	//o.update(INTERVAL);
-            		o.update((int)(System.currentTimeMillis() - lastTime));
-	            	if (!o.alive()) {
-	            		deaths.add(o);
-	            		}
-            	}
-            }
+//            for (Collection<GameObject> li  : gameObjects) {
+//            	for (GameObject o : li) {
+//	            	//o.update(INTERVAL);
+//            		o.update((int)(System.currentTimeMillis() - lastTime));
+//            		//System.out.println(balloons);
+//	            	if (!o.alive()) {
+//	            		deaths.add(o);
+//	            		}
+//            	}
+//            }
+        	
+        	for (GameObject o : projectiles) {
+        		//o.update(INTERVAL);
+        		o.update((int)(System.currentTimeMillis() - lastTime));
+        		System.out.println(balloons);
+        		if (!o.alive()) {
+        			deaths.add(o);
+        		}
+        	}
+        	
+        	
+        	for (GameObject o : balloons) {
+        		//o.update(INTERVAL);
+        		o.update((int)(System.currentTimeMillis() - lastTime));
+        		System.out.println(balloons);
+        		if (!o.alive()) {
+        			deaths.add(o);
+        		}
+        	}
+        	
             
             for (GameObject o : deaths) {
-            	projectiles.remove(o);
-            	balloons.remove(o);
+            	if (o instanceof Projectile)
+            		projectiles.remove(o);
+            	else if (o instanceof Balloon)
+            		balloons.remove(o);
             }
 
             

@@ -1,5 +1,6 @@
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 public abstract class Projectile extends GameObject{
 
@@ -10,19 +11,19 @@ public abstract class Projectile extends GameObject{
 	private int velY;
 	
 	
-	public Projectile(Image img, double x, double y, int velX, int velY) {
+	public Projectile(BufferedImage img, double x, double y, int velX, int velY) {
 		super(img, x, y);
 		this.velX = velX;
 		this.velY = velY;
 	}
 	
-	public Projectile(Image img, double x, double y) {
+	public Projectile(BufferedImage img, double x, double y) {
 		super(img, x, y);
 		this.velX = 0;
 		this.velY = 0;
 	}
 	
-	public Projectile(Image img) {
+	public Projectile(BufferedImage img) {
 		super(img);
 		this.velX = 0;
 		this.velY = 0;

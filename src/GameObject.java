@@ -2,23 +2,26 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 
 public abstract class GameObject {
 
 	private double x; 
 	private double y;
 	private double rotation = 0;
-	private Image img;
+	private BufferedImage img;
 	private boolean alive = true;
+	private double scaleX = 1;
+	private double scaleY = 1;
 		
 	
-	public GameObject(Image img, double x, double y) {
+	public GameObject(BufferedImage img, double x, double y) {
 		this.x = x;
 		this.y = y;
 		this.img = img;
 	}
 	
-	public GameObject(Image img) {
+	public GameObject(BufferedImage img) {
 		this.x = 0;
 		this.y = 0;
 		this.img = img;
@@ -69,16 +72,37 @@ public abstract class GameObject {
 		return alive;
 	}
 			
+	public void setImage(BufferedImage img) {
+		this.img = img;
+	}
+	
+	public BufferedImage getImage() {
+		return ResourceManager.copy(img);
+	}
+	
+	public void scale(double sx, double sy) {
+		scaleX = sx;
+		scaleY = sy;
+	}
+	
+	public int getWidth() {
+		return (int) (img.getWidth() * scaleX);
+	}
+	
+	public int getHeight() {
+		return (int) (img.getHeight() * scaleY);
+	}
 
 	public void draw(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		
+		BufferedImage image = ResourceManager.scaleImage(img, scaleX, scaleY);
 		
-		int w = img.getWidth(null);
-		int h = img.getHeight(null);
+		int w = image.getWidth();
+		int h = image.getHeight();
 		
 		  //Make a backup so that we can reset our graphics object after using it.
-	    AffineTransform backup = g2d.getTransform();
+	    //AffineTransform backup = g2d.getTransform();
 	    //rx is the x coordinate for rotation, ry is the y coordinate for rotation, and angle
 	    //is the angle to rotate the image. If you want to rotate around the center of an image,
 	    //use the image's center x and y coordinates for rx and ry.
@@ -86,10 +110,12 @@ public abstract class GameObject {
 	    //Set our Graphics2D object to the transform
 	    g2d.setTransform(a);
 	    //Draw our image like normal
-	    g2d.drawImage(img, (int)(x - w / 2.0), (int)(y - h / 2.0) , null);
+	    g2d.drawImage(image, (int)(x - w / 2.0), (int)(y - h / 2.0) , null);
 	    //Reset our graphics object so we can draw with it again.
-	    g2d.setTransform(backup);
+	    //g2d.setTransform(backup);
 	}
+	
+	
 	
 	
 	public abstract void update(int time);		
