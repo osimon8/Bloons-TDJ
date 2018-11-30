@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -175,22 +176,26 @@ public class GameCourt2 extends JPanel {
         lastTime = System.currentTimeMillis();
         elapsedTime = 0;
         numLoops = 0;
-
+        Bloon[] bloons = Bloon.values();	
+        Random r = new Random();
         
-//        Timer timer = new Timer(1000, new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//            	System.out.println("tick");
-//                int hp = (int) (Math.random() * 5 + 1);
-//
-//        			//Image img = DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0);
-//                BufferedImage img = res.getImage("stock_bloon");
-//                System.out.println(img);
-//        	    Balloon b = new Balloon(img, 100, 100, hp, bloonPath);
-//        	    balloons.add(b);
-//
-//            }
-//        });
-//        timer.start();
+        Timer timer = new Timer(1000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	System.out.println("tick");
+                //int hp = (int) (Math.random() * 5 + 1);
+
+        			//Image img = DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0);
+                //BufferedImage img = res.getImage("stock_bloon");
+               // System.out.println(img);
+            	int n = r.nextInt(bloons.length);
+            	//n=0;
+            	
+        	    Balloon b = new Balloon(bloons[n], bloonPath, res);
+        	    balloons.add(b);
+
+            }
+        });
+        timer.start();
         
     }
 
@@ -217,17 +222,17 @@ public class GameCourt2 extends JPanel {
 //                //status.setText("You win!");
 //            }
             
-        	if (numLoops % 60 == 0) {
-            	System.out.println("tick");
-              int hp = (int) (Math.random() * 5 + 1);
-
-      			//Image img = DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0);
-              BufferedImage img = res.getImage("stock_bloon");
-
-      	    Balloon b = new Balloon(img, 100, 100, hp, bloonPath);
-            System.out.println(b);
-      	    System.out.println(balloons.add(b));
-        	}
+//        	if (numLoops % 60 == 0) {
+//            	System.out.println("tick");
+//              int hp = (int) (Math.random() * 5 + 1);
+//
+//      			//Image img = DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0);
+//              BufferedImage img = res.getImage("stock_bloon");
+//
+//      	    Balloon b = new Balloon(img, 100, 100, hp, bloonPath);
+//            System.out.println(b);
+//      	    System.out.println(balloons.add(b));
+//        	}
         		
         	
         	List<GameObject> deaths = new LinkedList<>();
@@ -275,9 +280,10 @@ public class GameCourt2 extends JPanel {
 
             
             // update the display
-            paintImmediately(getBounds());
+            //paintImmediately(getBounds());
+            repaint();
             elapsedTime += deltaT;
-            numLoops++;
+            //numLoops++;
             lastTime = System.currentTimeMillis();
             //System.out.println(System.currentTimeMillis() - startTime);
         }

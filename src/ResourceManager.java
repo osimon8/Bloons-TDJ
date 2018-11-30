@@ -40,23 +40,14 @@ public class ResourceManager {
 		
 		
 		int[] data = getSprite(name);
+		
+		if (data == null)
+			throw new IllegalArgumentException("Error - Sprite name \"" +  name + "\" not found");
 
 		BufferedImage img = inGame.getSubimage(data[0], data[1], data[2], data[3]);
 
-		//RED: 207, 0, 0
-		//BLUE: 44, 147, 215
-		//GREEN: 120, 182, 0
-		//YELLOW: 255, 226, 0
-		//PINK: 255, 96, 111
-		//BLACK: 25, 25, 25
-		
-		//img = tint(img, new Color(50, 220, 255));
 		
 		//use this for creating new image w/o reference to whole sprite sheet
-//		BufferedImage img = image.getSubimage(startX, startY, endX, endY); //fill in the corners of the desired crop location here
-//		BufferedImage copyOfImage = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
-//		Graphics g = copyOfImage.createGraphics();
-//		g.drawImage(img, 0, 0, null);
 		
 		
 		return img;
@@ -67,7 +58,7 @@ public class ResourceManager {
 	public static BufferedImage tint(BufferedImage image, Color color) {
 		BufferedImage copy = copy(image);
 		
-    	float hue  = ( color.getRed() + color.getBlue() + color.getGreen())/ (255 * 3);
+    	//float hue  = ( color.getRed() + color.getBlue() + color.getGreen())/ (255 * 3);
 		
 	    for (int x = 0; x < copy.getWidth(); x++) {
 	        for (int y = 0; y < copy.getHeight(); y++) {
@@ -79,6 +70,9 @@ public class ResourceManager {
 
 
 	            float[] hsb = Color.RGBtoHSB(r, g, b, null);
+	            
+	           //if (!color.equals(Color.BLACK))
+	            
 	            Color n = Color.getHSBColor(hsb[0], hsb[1] + 0.5F, hsb[2]);
 	            
 	            r = n.getRed();

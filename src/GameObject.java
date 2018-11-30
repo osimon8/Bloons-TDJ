@@ -85,6 +85,10 @@ public abstract class GameObject {
 		scaleY = sy;
 	}
 	
+	public void scale(double s) {
+		scale(s, s);
+	}
+	
 	public int getWidth() {
 		return (int) (img.getWidth() * scaleX);
 	}
