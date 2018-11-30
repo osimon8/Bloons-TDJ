@@ -50,7 +50,7 @@ public class ResourceManager {
 		//PINK: 255, 96, 111
 		//BLACK: 25, 25, 25
 		
-		img = tint(img, new Color(50, 220, 255));
+		//img = tint(img, new Color(50, 220, 255));
 		
 		//use this for creating new image w/o reference to whole sprite sheet
 //		BufferedImage img = image.getSubimage(startX, startY, endX, endY); //fill in the corners of the desired crop location here
@@ -67,15 +67,52 @@ public class ResourceManager {
 	public static BufferedImage tint(BufferedImage image, Color color) {
 		BufferedImage copy = copy(image);
 		
+    	float hue  = ( color.getRed() + color.getBlue() + color.getGreen())/ (255 * 3);
+		
 	    for (int x = 0; x < copy.getWidth(); x++) {
 	        for (int y = 0; y < copy.getHeight(); y++) {
 	            Color pixelColor = new Color(copy.getRGB(x, y), true);
-	            int r = (pixelColor.getRed() + color.getRed()) / 2;
-	            int g = (pixelColor.getGreen() + color.getGreen()) / 2;
-	            int b = (pixelColor.getBlue() + color.getBlue()) / 2;
+	            int r = (3 *pixelColor.getRed() + color.getRed()) / 4;
+	            int g = (3 * pixelColor.getGreen() + color.getGreen()) / 4;
+	            int b = (3 *pixelColor.getBlue() + color.getBlue()) / 4;
 	            int a = pixelColor.getAlpha();
+
+
+	            float[] hsb = Color.RGBtoHSB(r, g, b, null);
+	            Color n = Color.getHSBColor(hsb[0], hsb[1] + 0.5F, hsb[2]);
+	            
+	            r = n.getRed();
+	            g = n.getGreen();
+	            b = n.getBlue();
+	            
 	            int rgba = (a << 24) | (r << 16) | (g << 8) | b; //not sure exactly how this works, shifts over bits to form integer representing argb values
+	            
 	            copy.setRGB(x, y, rgba);
+	            
+//	            if (pixelColor.) {
+//		            int r = color.getRed();
+//		            int g = color.getGreen();
+//		            int b = color.getBlue();
+//		        	int a = pixelColor.getAlpha();
+//		            int rgba = (a << 24) | (r << 16) | (g << 8) | b;
+//		        	copy.setRGB(x, y, rgba);
+//	            }
+	            	
+	        	
+//	            float[] hsb = Color.RGBtoHSB(pixelColor.getRed(), pixelColor.getGreen(), pixelColor.getBlue(), null);
+//	            System.out.println("" + hsb[0] + " " + hsb[1] + " " + hsb[2]);
+//	        	Color n = Color.getHSBColor(hsb[0], hsb[1] + 1F, hsb[2]);
+//	        	
+//	        	int r = n.getRed();
+//	        	int g = n.getBlue();
+//	        	int b = n.getGreen();
+//	        	int a = pixelColor.getAlpha();
+//	        	
+//	        	int rgba = (a << 24) | (r << 16) | (g << 8) | b;
+
+	        	
+	        	
+	        	
 	        }
 	    }
 	    

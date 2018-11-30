@@ -32,7 +32,7 @@ public class GameCourt2 extends JPanel {
 	private int lives = 100;
 	private int money = 1000;
 	private List<Projectile> projectiles;
-	private volatile Set<Balloon> balloons;
+	private Set<Balloon> balloons;
 	private List<Collection> gameObjects;
 	private ResourceManager res;
 	private Point[] bloonPath;
@@ -49,13 +49,15 @@ public class GameCourt2 extends JPanel {
     // Update interval for timer, in milliseconds
     
     
-    public static final int INTERVAL = 16 ;
+    public static final int INTERVAL = 16;
 
     private static long lastTime = 0;
+    private long elapsedTime;
+    private long numLoops;
     
     public GameCourt2() {
         // creates border around the court area, JComponent method
-        setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        //setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         // The timer is an object which triggers an action periodically with the given INTERVAL. We
         // register an ActionListener with this timer, whose actionPerformed() method is called each
@@ -145,8 +147,18 @@ public class GameCourt2 extends JPanel {
     
         res = new ResourceManager();
 
+        
+        BufferedImage ig = res.getImage("stock_bloon");
+        try {
 
-
+            File f = new File("files/stock.png");
+            //f.createNewFile();
+			ImageIO.write(ig, "png", f);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        
     }
 
     /**
@@ -161,23 +173,24 @@ public class GameCourt2 extends JPanel {
         // Make sure that this component has the keyboard focus
         requestFocusInWindow();
         lastTime = System.currentTimeMillis();
-        
+        elapsedTime = 0;
+        numLoops = 0;
 
         
-        Timer timer = new Timer(1000, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            	System.out.println("tick");
-                int hp = (int) (Math.random() * 5 + 1);
-
-        			//Image img = DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0);
-                BufferedImage img = res.getImage("stock_bloon");
-                System.out.println(img);
-        	    Balloon b = new Balloon(img, 100, 100, hp, bloonPath);
-        	    balloons.add(b);
-
-            }
-        });
-        timer.start();
+//        Timer timer = new Timer(1000, new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//            	System.out.println("tick");
+//                int hp = (int) (Math.random() * 5 + 1);
+//
+//        			//Image img = DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0);
+//                BufferedImage img = res.getImage("stock_bloon");
+//                System.out.println(img);
+//        	    Balloon b = new Balloon(img, 100, 100, hp, bloonPath);
+//        	    balloons.add(b);
+//
+//            }
+//        });
+//        timer.start();
         
     }
 
@@ -204,6 +217,19 @@ public class GameCourt2 extends JPanel {
 //                //status.setText("You win!");
 //            }
             
+        	if (numLoops % 60 == 0) {
+            	System.out.println("tick");
+              int hp = (int) (Math.random() * 5 + 1);
+
+      			//Image img = DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0);
+              BufferedImage img = res.getImage("stock_bloon");
+
+      	    Balloon b = new Balloon(img, 100, 100, hp, bloonPath);
+            System.out.println(b);
+      	    System.out.println(balloons.add(b));
+        	}
+        		
+        	
         	List<GameObject> deaths = new LinkedList<>();
         	
 //            for (Collection<GameObject> li  : gameObjects) {
@@ -216,11 +242,14 @@ public class GameCourt2 extends JPanel {
 //	            		}
 //            	}
 //            }
+        
+        	
+        	int deltaT = (int)(System.currentTimeMillis() - lastTime);
         	
         	for (GameObject o : projectiles) {
         		//o.update(INTERVAL);
-        		o.update((int)(System.currentTimeMillis() - lastTime));
-        		System.out.println(balloons);
+        		o.update(deltaT);
+        		//System.out.println(balloons);
         		if (!o.alive()) {
         			deaths.add(o);
         		}
@@ -229,8 +258,8 @@ public class GameCourt2 extends JPanel {
         	
         	for (GameObject o : balloons) {
         		//o.update(INTERVAL);
-        		o.update((int)(System.currentTimeMillis() - lastTime));
-        		System.out.println(balloons);
+        		o.update(deltaT);
+        		//System.out.println(balloons);
         		if (!o.alive()) {
         			deaths.add(o);
         		}
@@ -246,7 +275,9 @@ public class GameCourt2 extends JPanel {
 
             
             // update the display
-            repaint();
+            paintImmediately(getBounds());
+            elapsedTime += deltaT;
+            numLoops++;
             lastTime = System.currentTimeMillis();
             //System.out.println(System.currentTimeMillis() - startTime);
         }

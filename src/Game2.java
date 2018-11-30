@@ -60,6 +60,7 @@ public class Game2 implements Runnable {
         
         final JButton play_button;
         
+        
         Image img = DataLoader.loadImage("files/poison.png");
         if (img != null) {
             img = img.getScaledInstance(100, 100, 0);

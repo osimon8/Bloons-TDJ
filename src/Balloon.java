@@ -10,12 +10,12 @@ import java.util.List;
 
 public class Balloon extends GameObject implements Comparable<Balloon>{
 	
-	public static Color RED = new Color(207, 0, 0);
-	public static Color BLUE = new Color(44, 147, 215);
-	public static Color GREEN = new Color(120, 182, 0);
-	public static Color YELLOW = new Color(255, 226, 0);
-	public static Color PINK = new Color(255, 96, 111);
-	public static Color BLACK = new Color(25, 25, 25);
+	public static Color RED = new Color(255, 80, 40);
+	public static Color BLUE = new Color(40, 180, 210);
+	public static Color GREEN = new Color(15, 255, 30);
+	public static Color YELLOW = new Color(255, 255, 20);
+	public static Color PINK = new Color(230, 160, 210);
+	public static Color BLACK = new Color(0, 0, 0);
 	
 	
 	private static double speedScale = 50;
@@ -25,7 +25,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	private int pathPosition;
 	
 	public Balloon(BufferedImage img, double x, double y, int hp, Point[] path) {
-		super(img, x, y);
+		super(ResourceManager.copy(img), x, y);
 		this.hp = hp;
 		this.path = path;
 		pathPosition = 0;
@@ -118,7 +118,12 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 
 	@Override
 	public int compareTo(Balloon b) {
-		return b.getHP() - hp;
+		int val = b.getHP() - hp;
+		if (val != 0)
+			return val;
+		
+		return 1;
+		
 	}
 	
 
