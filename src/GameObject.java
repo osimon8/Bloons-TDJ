@@ -1,8 +1,10 @@
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 
 public abstract class GameObject {
 
@@ -96,6 +98,12 @@ public abstract class GameObject {
 	public int getHeight() {
 		return (int) (img.getHeight() * scaleY);
 	}
+	
+	public Rectangle getBounds() {
+		int w = getWidth();
+		int h = getHeight();
+		return new Rectangle((int)x - w /2, (int)y - w/2, w, h);
+	}
 
 	public void draw(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
@@ -122,7 +130,7 @@ public abstract class GameObject {
 	
 	
 	
-	public abstract void update(int time);		
+	public abstract Collection<GameObject> update(int time);		
 
 	
 

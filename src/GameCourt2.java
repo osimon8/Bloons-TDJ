@@ -33,7 +33,8 @@ public class GameCourt2 extends JPanel {
 	private int lives = 100;
 	private int money = 1000;
 	private List<Projectile> projectiles;
-	private Set<Balloon> balloons;
+	private List<Balloon> balloons;
+	private List<Tower> towers;
 	private List<Collection> gameObjects;
 	private ResourceManager res;
 	private Point[] bloonPath;
@@ -132,7 +133,8 @@ public class GameCourt2 extends JPanel {
         
         gameObjects = new LinkedList<>();
         projectiles = new LinkedList<>();
-        balloons = new TreeSet<>();
+        towers = new LinkedList<>();
+        balloons = new LinkedList<>();
         
         
         gameObjects.add(projectiles);
@@ -146,7 +148,11 @@ public class GameCourt2 extends JPanel {
         
         projectiles.add(dart);
     
-        res = new ResourceManager();
+        res = ResourceManager.getInstance();
+        
+        towers.add(new Tower(res.getImage("dart_monkey_body"), 1000.0, 100.0, 300.0, 0.0, balloons));
+        
+
 
         
         BufferedImage ig = res.getImage("stock_bloon");
@@ -190,7 +196,7 @@ public class GameCourt2 extends JPanel {
             	int n = r.nextInt(bloons.length);
             	//n=0;
             	
-        	    Balloon b = new Balloon(bloons[n], bloonPath, res);
+        	    Balloon b = new Balloon(bloons[n], bloonPath);
         	    balloons.add(b);
 
             }
@@ -261,6 +267,19 @@ public class GameCourt2 extends JPanel {
         	}
         	
         	
+        	for (GameObject t : towers) {
+        		//o.update(INTERVAL);
+        		Collection<GameObject> projs = t.update(deltaT);
+        		if (projs != null) {
+	        		for (GameObject o : projs)
+	        			projectiles.add((Projectile) o);
+        		}
+        		//System.out.println(balloons);
+        		if (!t.alive()) {
+        			deaths.add(t);
+        		}
+        	}
+        	
         	for (GameObject o : balloons) {
         		//o.update(INTERVAL);
         		o.update(deltaT);
@@ -274,8 +293,10 @@ public class GameCourt2 extends JPanel {
             for (GameObject o : deaths) {
             	if (o instanceof Projectile)
             		projectiles.remove(o);
-            	else if (o instanceof Balloon)
+            	else if (o instanceof Balloon) 
             		balloons.remove(o);
+            	else if (o instanceof Tower) 
+            		towers.remove(o);
             }
 
             
@@ -293,11 +314,15 @@ public class GameCourt2 extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(background, 0, 0, null);
-        for (Collection<GameObject> li  : gameObjects) {
-        	for (GameObject o : li) {
-        		o.draw(g);
-        	}
-        }
+    	for (Projectile p : projectiles) {
+    		p.draw(g);
+    	}
+    	for (Balloon b : balloons) {
+    		b.draw(g);
+    	}
+    	for (Tower t : towers) {
+    		t.draw(g);
+    	}
     }
          
 

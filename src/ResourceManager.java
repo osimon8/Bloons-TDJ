@@ -16,8 +16,9 @@ public class ResourceManager {
 	
 	private Map<String, int[]> sprites;
 	private BufferedImage inGame;
+	private static ResourceManager instance;
 	
-	public ResourceManager() {
+	private ResourceManager() {
 		
 		try {
 			sprites = DataLoader.parseXML("files/InGame.xml");
@@ -31,6 +32,14 @@ public class ResourceManager {
 		// TODO Auto-generated constructor stub
 	}
 	
+	
+    static {
+        instance = new ResourceManager();
+    }
+    
+    public static ResourceManager getInstance() {
+    	return instance;
+    }
 	
 	public int[] getSprite(String name) {
 		return sprites.get(name);
@@ -70,10 +79,10 @@ public class ResourceManager {
 
 
 	            float[] hsb = Color.RGBtoHSB(r, g, b, null);
-	            
+	             
 	           //if (!color.equals(Color.BLACK))
 	            
-	            Color n = Color.getHSBColor(hsb[0], hsb[1] + 0.5F, hsb[2]);
+	            Color n = Color.getHSBColor(hsb[0], hsb[1] + (color.equals(Color.BLACK) ? 0 : 0.5F ), hsb[2]);
 	            
 	            r = n.getRed();
 	            g = n.getGreen();

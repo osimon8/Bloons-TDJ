@@ -1,5 +1,6 @@
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 
 public class TargetedProjectile extends Projectile {
 
@@ -44,9 +45,15 @@ public class TargetedProjectile extends Projectile {
 		
 	}
 	
+	public static TargetedProjectile makeDart(double x, double y, double tx, double ty){
+        BufferedImage dartImage = ResourceManager.getInstance().getImage("dart_monkey_dart");
+        TargetedProjectile dart = new TargetedProjectile(dartImage, x, x, 300, tx, ty);
+        return dart;
+	}
+	
 
 	@Override
-	public void update(int time) {
+	public Collection<GameObject> update(int time) {
 		int velX = getVelX();
 		int velY = getVelY();
 		
@@ -55,6 +62,8 @@ public class TargetedProjectile extends Projectile {
 		if (Math.abs(targetX - getX()) < 1 && Math.abs(targetY - getY()) < 1)
 			flagForDeath();
 		
+		
+		return null;
 		//rotate(1);		
 		
 	}
