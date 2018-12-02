@@ -27,7 +27,7 @@ import javax.swing.*;
  * on every tick().
  */
 @SuppressWarnings("serial")
-public class GameCourt2 extends JPanel {
+public class Field extends JPanel {
 
 	
 	private int lives = 100;
@@ -35,6 +35,7 @@ public class GameCourt2 extends JPanel {
 	private List<Projectile> projectiles;
 	private List<Balloon> balloons;
 	private List<Tower> towers;
+	private List<Effect> effects;
 	private List<Collection> gameObjects;
 	private ResourceManager res;
 	private Point[] bloonPath;
@@ -57,7 +58,10 @@ public class GameCourt2 extends JPanel {
     private long elapsedTime;
     private long numLoops;
     
-    public GameCourt2() {
+    private Tower selectedTower;
+    private Tower placingTower;
+    
+    public Field() {
         // creates border around the court area, JComponent method
         //setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
@@ -133,6 +137,7 @@ public class GameCourt2 extends JPanel {
         
         gameObjects = new LinkedList<>();
         projectiles = new LinkedList<>();
+        effects = new LinkedList<>();
         towers = new LinkedList<>();
         balloons = new LinkedList<>();
         
@@ -141,30 +146,46 @@ public class GameCourt2 extends JPanel {
         gameObjects.add(balloons);
         
         
-        BufferedImage dartImage = DataLoader.loadImage(Projectile.DART);
-        dartImage = ResourceManager.resizeImage(dartImage, 40, 10);
-
-        Projectile dart = new TargetedProjectile(dartImage, 100, 100, 160, 200, 200);
+//        BufferedImage dartImage = DataLoader.loadImage(Projectile.DART);
+//        dartImage = ResourceManager.resizeImage(dartImage, 40, 10);
+//
+//        Projectile dart = new TargetedProjectile(dartImage, 100, 100, 160, 200, 200);
+//        
+//        
+//        
+//        projectiles.add(dart);
         
-        projectiles.add(dart);
-    
+        
+        //lots of test darts for projectile motion
+        
+//        projectiles.add(TargetedProjectile.makeDart(500, 500, 500, 100)); //N
+//        projectiles.add(TargetedProjectile.makeDart(500, 500, 500, 900)); //S
+//        projectiles.add(TargetedProjectile.makeDart(500, 500, 100, 500)); //W
+//        projectiles.add(TargetedProjectile.makeDart(500, 500, 900, 500)); //E
+//        
+//        
+//        
+//        projectiles.add(TargetedProjectile.makeDart(500, 500, 800, 800)); //SE
+//        projectiles.add(TargetedProjectile.makeDart(500, 500, 200, 200)); //NW
+//        projectiles.add(TargetedProjectile.makeDart(500, 500, 200, 800)); //SW
+//        projectiles.add(TargetedProjectile.makeDart(500, 500, 800, 200)); //NE
         res = ResourceManager.getInstance();
         
         towers.add(new Tower(res.getImage("dart_monkey_body"), 1000.0, 100.0, 300.0, 100, balloons));
         
-
-
-        
-        BufferedImage ig = res.getImage("stock_bloon");
-        try {
-
-            File f = new File("files/stock.png");
-            //f.createNewFile();
-			ImageIO.write(ig, "png", f);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+//
+//
+//        
+//        BufferedImage ig = res.getImage("stock_bloon");
+//        try {
+//
+//            File f = new File("files/stock.png");
+//            //f.createNewFile();
+//			ImageIO.write(ig, "png", f);
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
         
     }
 
@@ -187,7 +208,7 @@ public class GameCourt2 extends JPanel {
         
         Timer timer = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	System.out.println("tick");
+            	//System.out.println("tick");
                 //int hp = (int) (Math.random() * 5 + 1);
 
         			//Image img = DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0);
@@ -210,52 +231,24 @@ public class GameCourt2 extends JPanel {
      */
     void tick() {
         if (playing) {
-//            // advance the square and snitch in their current direction.
-//            square.move();
-//            snitch.move();
-//
-//            // make the snitch bounce off walls...
-//            snitch.bounce(snitch.hitWall());
-//            // ...and the mushroom
-//            snitch.bounce(snitch.hitObj(poison));
-//
-//            // check for the game end conditions
-//            if (square.intersects(poison)) {
-//                playing = false;
-//                //status.setText("You lose!");
-//            } else if (square.intersects(snitch)) {
-//                playing = false;
-//                //status.setText("You win!");
-//            }
-            
-//        	if (numLoops % 60 == 0) {
-//            	System.out.println("tick");
-//              int hp = (int) (Math.random() * 5 + 1);
-//
-//      			//Image img = DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0);
-//              BufferedImage img = res.getImage("stock_bloon");
-//
-//      	    Balloon b = new Balloon(img, 100, 100, hp, bloonPath);
-//            System.out.println(b);
-//      	    System.out.println(balloons.add(b));
-//        	}
-        		
-        	
+	
         	List<GameObject> deaths = new LinkedList<>();
         	
-//            for (Collection<GameObject> li  : gameObjects) {
-//            	for (GameObject o : li) {
-//	            	//o.update(INTERVAL);
-//            		o.update((int)(System.currentTimeMillis() - lastTime));
-//            		//System.out.println(balloons);
-//	            	if (!o.alive()) {
-//	            		deaths.add(o);
-//	            		}
-//            	}
-//            }
-        
-        	
         	int deltaT = (int)(System.currentTimeMillis() - lastTime);
+
+        	for (GameObject t : towers) {
+        		//o.update(INTERVAL);
+        		Collection<GameObject> projs = t.update(deltaT);
+        		if (projs != null) {
+	        		for (GameObject o : projs) {
+	        			projectiles.add((Projectile) o);
+	        		}
+        		}
+        		//System.out.println(balloons);
+        		if (!t.alive()) {
+        			deaths.add(t);
+        		}
+        	}
         	
         	for (GameObject o : projectiles) {
         		//o.update(INTERVAL);
@@ -266,23 +259,28 @@ public class GameCourt2 extends JPanel {
         		}
         	}
         	
+        	List<Balloon> newBalloons = new LinkedList<>();
         	
-        	for (GameObject t : towers) {
+        	for (GameObject b : balloons) {
         		//o.update(INTERVAL);
-        		Collection<GameObject> projs = t.update(deltaT);
-        		if (projs != null) {
-	        		for (GameObject o : projs) {
-	        			projectiles.add((Projectile) o);
-	        			System.out.println(o.getX() + ", " + o.getY());
+        		Collection<GameObject> newStuff = b.update(deltaT);
+        		if (newStuff != null) {
+	        		for (GameObject o : newStuff) {
+	        			if (o instanceof Balloon)
+	        				newBalloons.add((Balloon) o);
+	        			else if (o instanceof Effect)
+	        				effects.add((Effect) o);
 	        		}
         		}
         		//System.out.println(balloons);
-        		if (!t.alive()) {
-        			deaths.add(t);
+        		if (!b.alive()) {
+        			deaths.add(b);
         		}
         	}
         	
-        	for (GameObject o : balloons) {
+        	balloons.addAll(newBalloons);
+        	
+        	for (GameObject o : effects) {
         		//o.update(INTERVAL);
         		o.update(deltaT);
         		//System.out.println(balloons);
@@ -299,13 +297,18 @@ public class GameCourt2 extends JPanel {
             		balloons.remove(o);
             	else if (o instanceof Tower) 
             		towers.remove(o);
+            	else if (o instanceof Effect) 
+            		effects.remove(o);
             }
+            
+            
+            
 
             
             // update the display
             //paintImmediately(getBounds());
             repaint();
-            elapsedTime += deltaT;
+            //elapsedTime += deltaT;
             //numLoops++;
             lastTime = System.currentTimeMillis();
             //System.out.println(System.currentTimeMillis() - startTime);
@@ -316,14 +319,17 @@ public class GameCourt2 extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(background, 0, 0, null);
+    	for (Tower t : towers) {
+    		t.draw(g);
+    	}
     	for (Projectile p : projectiles) {
     		p.draw(g);
     	}
     	for (Balloon b : balloons) {
     		b.draw(g);
     	}
-    	for (Tower t : towers) {
-    		t.draw(g);
+    	for (Effect e : effects) {
+    		e.draw(g);
     	}
     }
          

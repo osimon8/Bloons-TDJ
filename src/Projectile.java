@@ -1,6 +1,7 @@
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 
 public abstract class Projectile extends GameObject{
 
@@ -9,24 +10,27 @@ public abstract class Projectile extends GameObject{
 
 	private int velX;
 	private int velY;
+	private Collection<Balloon> balloons;
 	
-	
-	public Projectile(BufferedImage img, double x, double y, int velX, int velY) {
+	public Projectile(BufferedImage img, double x, double y, int velX, int velY, Collection<Balloon> b) {
 		super(img, x, y);
 		this.velX = velX;
 		this.velY = velY;
+		this.balloons = b;
 	}
 	
-	public Projectile(BufferedImage img, double x, double y) {
+	public Projectile(BufferedImage img, double x, double y, Collection<Balloon> b) {
 		super(img, x, y);
 		this.velX = 0;
 		this.velY = 0;
+		this.balloons = b;
 	}
 	
-	public Projectile(BufferedImage img) {
+	public Projectile(BufferedImage img, Collection<Balloon> b) {
 		super(img);
 		this.velX = 0;
 		this.velY = 0;
+		this.balloons = b;
 	}
 
 	public int getVelX() {
@@ -47,8 +51,17 @@ public abstract class Projectile extends GameObject{
 		this.velY = (int)y;
 	}
 	
-	@Override 
-	public void rotate(double angle) {
-		super.rotate(angle);
+	public Collection<Balloon> getBalloons() {
+		return balloons;
 	}
+	
+	public Balloon intersectingBalloon() {
+		for (Balloon b : balloons) {
+			if (intersects(b))
+				return b;
+		}
+		return null;
+		
+	}
+
 }

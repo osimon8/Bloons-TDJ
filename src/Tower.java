@@ -23,7 +23,7 @@ public class Tower extends GameObject {
 	private double fireRate;
 	private double fireCooldown;
 	private TargetMode mode;
-	private boolean selected = true;
+	private boolean selected = false;
 	
 	
 	public Tower(BufferedImage img, double x, double y, double vr, double br, Collection<Balloon> balloons) {
@@ -39,16 +39,32 @@ public class Tower extends GameObject {
 		// TODO Auto-generated constructor stub
 	}
 
+	public static Tower makeDartMonkey(double x, double y, Collection<Balloon> balloons) {
+		return new Tower(ResourceManager.getInstance().getImage("dart_monkey_dart"), x, y, 300, 0, balloons);
+	}
+	
 	
 	public void setTargetMode(TargetMode m) {
 		mode = m;
 	}
 	
+	
+	public void select() {
+		selected = true;
+	}
+	
+	public void deselect() {
+		selected = false;
+	}
+	
+	
 	private List<Balloon> intersectBloon() {
 		List<Balloon> l = new LinkedList<>();
 		
 		for (Balloon b : balloons) {
-			if (FOV.intersects(b.getBounds()))
+			Area a = new Area(b.getBounds());
+			a.intersect(FOV);
+			if (!a.isEmpty())
 				l.add(b);
 		}
 		return l;
@@ -97,10 +113,11 @@ public class Tower extends GameObject {
 	
 	private Collection<GameObject> fire(Balloon target) {
 		Collection<GameObject> ret = new LinkedList<>(); 
-		ret.add(TargetedProjectile.makeDart(getX(), getY(), target.getX(), target.getY()));
+		ret.add(TargetedProjectile.makeDart(getX(), getY(), target.getX(), target.getY(), balloons));
 		align(target.getX(), target.getY());
 		return ret;
 	}
+	
 	
 	@Override
 	public void draw (Graphics g) {
