@@ -21,11 +21,13 @@ public class TargetedProjectile extends Projectile {
 	
 	private double targetX;
 	private double targetY;
+	private double distance;
 	
 	public TargetedProjectile(BufferedImage img, double x, double y, int speed, double targetX, double targetY) {
 		super(img, x, y);
 		double dx = targetX - x;
 		double dy = targetY - y;
+		distance = Math.sqrt(dx * dx + dy * dy);
 		double theta;
 		if (dx == 0) {
 			theta = Math.PI/2;
@@ -36,7 +38,7 @@ public class TargetedProjectile extends Projectile {
 		else {
 			theta = Math.atan(dy / dx);
 		}
-		rotate(theta);
+		align(targetX, targetY);
 		setVelX(speed * Math.cos(theta));
 		setVelY(speed * Math.sin(theta));
 		
@@ -47,7 +49,8 @@ public class TargetedProjectile extends Projectile {
 	
 	public static TargetedProjectile makeDart(double x, double y, double tx, double ty){
         BufferedImage dartImage = ResourceManager.getInstance().getImage("dart_monkey_dart");
-        TargetedProjectile dart = new TargetedProjectile(dartImage, x, x, 300, tx, ty);
+        TargetedProjectile dart = new TargetedProjectile(dartImage, x, y, 600, tx, ty);
+        dart.scale(0.75);
         return dart;
 	}
 	
@@ -57,9 +60,14 @@ public class TargetedProjectile extends Projectile {
 		int velX = getVelX();
 		int velY = getVelY();
 		
-		shift(velX * (time / 1000.0), velY * (time / 1000.0));
+		double dx = velX * (time / 1000.0);
+		double dy = velY * (time / 1000.0);
 		
-		if (Math.abs(targetX - getX()) < 1 && Math.abs(targetY - getY()) < 1)
+		shift(dx, dy);
+		
+		distance -= Math.sqrt(dx * dx + dy * dy);
+		
+		if (distance <= 0)
 			flagForDeath();
 		
 		

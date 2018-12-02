@@ -1,3 +1,7 @@
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
@@ -5,6 +9,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+
 
 public class Tower extends GameObject {
 
@@ -17,6 +23,7 @@ public class Tower extends GameObject {
 	private double fireRate;
 	private double fireCooldown;
 	private TargetMode mode;
+	private boolean selected = true;
 	
 	
 	public Tower(BufferedImage img, double x, double y, double vr, double br, Collection<Balloon> balloons) {
@@ -91,9 +98,27 @@ public class Tower extends GameObject {
 	private Collection<GameObject> fire(Balloon target) {
 		Collection<GameObject> ret = new LinkedList<>(); 
 		ret.add(TargetedProjectile.makeDart(getX(), getY(), target.getX(), target.getY()));
+		align(target.getX(), target.getY());
 		return ret;
 	}
 	
+	@Override
+	public void draw (Graphics g) {
+		//Graphics2D gc = (Graphics2D)g;
+		
+		if (selected) {
+			Color c = g.getColor();
+			g.setColor(new Color(100, 100, 100, 155));
+			g.fillOval((int) (getX() - viewR / 2), (int) (getY() - viewR / 2), (int)viewR, (int)viewR);
+			g.setColor(new Color(255, 0, 0, 70));
+			g.fillOval((int) (getX() - blindR / 2), (int) (getY() - blindR / 2), (int)blindR, (int)blindR);			
+			g.setColor(c);
+//			Rectangle r = getBounds();
+//			g.drawRect(r.x, r.y, r.width, r.height);
+		}
+		super.draw(g);
+		
+	}
 	
 	
 

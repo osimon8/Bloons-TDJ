@@ -150,7 +150,7 @@ public class GameCourt2 extends JPanel {
     
         res = ResourceManager.getInstance();
         
-        towers.add(new Tower(res.getImage("dart_monkey_body"), 1000.0, 100.0, 300.0, 0.0, balloons));
+        towers.add(new Tower(res.getImage("dart_monkey_body"), 1000.0, 100.0, 300.0, 100, balloons));
         
 
 
@@ -271,8 +271,10 @@ public class GameCourt2 extends JPanel {
         		//o.update(INTERVAL);
         		Collection<GameObject> projs = t.update(deltaT);
         		if (projs != null) {
-	        		for (GameObject o : projs)
+	        		for (GameObject o : projs) {
 	        			projectiles.add((Projectile) o);
+	        			System.out.println(o.getX() + ", " + o.getY());
+	        		}
         		}
         		//System.out.println(balloons);
         		if (!t.alive()) {

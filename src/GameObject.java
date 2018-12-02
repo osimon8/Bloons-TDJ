@@ -1,6 +1,7 @@
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -104,6 +105,25 @@ public abstract class GameObject {
 		int h = getHeight();
 		return new Rectangle((int)x - w /2, (int)y - w/2, w, h);
 	}
+	
+	public void align(double tx, double ty) {
+//		double ax = this.x;
+//		double ah = this.y - getWidth() / 2;
+		
+		double theta;
+		
+		if (ty == y)
+			if (ty < y)
+				theta = -180;
+			else
+				theta = 0;
+		else
+			theta = 180 - Math.atan((tx - x) / (ty - y)) * 180 / Math.PI;
+		
+		rotate(theta);
+		
+	}
+	
 
 	public void draw(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
