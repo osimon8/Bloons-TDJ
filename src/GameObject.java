@@ -116,11 +116,11 @@ public abstract class GameObject {
 		// (x + w / 2, y + h / 2)
 		// (x - w / 2, y + h / 2)
 		// (x - w / 2, y - h / 2)
-		// (xcost - ysint, xsint + ycost)
-		int[] xcoords = new int[] {  (int)(x + (w) * c - (-h) * s),
-									(int)(x + (w) * c - (h) * s),
-									(int)(x + (-w) * c - (h) * s),
-									(int)(x +(-w) * c - (-h) * s)					
+		// (xcost - ysint, xsint + ycost) //rotation by t 
+		int[] xcoords = new int[] {  (int)(x + (w) * c - (-h) * s), //TR
+									(int)(x + (w) * c - (h) * s), //BR
+									(int)(x + (-w) * c - (h) * s), //BL
+									(int)(x +(-w) * c - (-h) * s) //TL			
 		};
 		
 		int[] ycoords = new int[] { (int)(y + (w) * s + (-h) * c),

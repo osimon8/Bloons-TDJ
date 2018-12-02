@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
@@ -23,7 +24,7 @@ public class Tower extends GameObject {
 	private double fireRate;
 	private double fireCooldown;
 	private TargetMode mode;
-	private boolean selected = false;
+	private boolean selected = true;
 	
 	
 	public Tower(BufferedImage img, double x, double y, double vr, double br, Collection<Balloon> balloons) {
@@ -72,6 +73,7 @@ public class Tower extends GameObject {
 
 	
 	private Balloon selectTarget(List<Balloon> bs) {
+		Collections.sort(bs);
 		switch(mode){
 		default:
 		case FIRST:
@@ -96,7 +98,7 @@ public class Tower extends GameObject {
 			List<Balloon> intersect = intersectBloon();
 			if (!intersect.isEmpty()) {
 				fireCooldown = 1000.0 / fireRate;
-				ret =  fire(selectTarget(intersect));
+				ret =  fire(selectTarget(intersect), time);
 			}
 			
 			
@@ -111,10 +113,17 @@ public class Tower extends GameObject {
 	}
 	
 	
-	private Collection<GameObject> fire(Balloon target) {
+	private Collection<GameObject> fire(Balloon target, int time) {
 		Collection<GameObject> ret = new LinkedList<>(); 
-		ret.add(TargetedProjectile.makeDart(getX(), getY(), target.getX(), target.getY(), balloons));
-		align(target.getX(), target.getY());
+//		double tx = target.getX();
+//		double ty = target.getY();
+		Point t = target.getProjectedLocation(time);
+		double tx = t.getX();
+		double ty = t.getY();
+		
+		
+		ret.add(TargetedProjectile.makeDart(getX(), getY(), tx, ty, balloons));
+		align(tx, ty);
 		return ret;
 	}
 	

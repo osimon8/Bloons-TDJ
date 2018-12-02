@@ -235,7 +235,7 @@ public class Field extends JPanel {
         	List<GameObject> deaths = new LinkedList<>();
         	
         	int deltaT = (int)(System.currentTimeMillis() - lastTime);
-
+        	//System.out.println(deltaT);
         	for (GameObject t : towers) {
         		//o.update(INTERVAL);
         		Collection<GameObject> projs = t.update(deltaT);

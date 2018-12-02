@@ -6,6 +6,7 @@ import java.util.Collection;
 public class TargetedProjectile extends Projectile {
 	
 	private double distance;
+	private static final int BBOX_SCALE = 15;
 	
 	public TargetedProjectile(BufferedImage img, double x, double y, int speed, double targetX, double targetY, Collection<Balloon> b) {
 		super(img, x, y, b);
@@ -22,12 +23,47 @@ public class TargetedProjectile extends Projectile {
 	
 	public static TargetedProjectile makeDart(double x, double y, double tx, double ty, Collection<Balloon> b){
         BufferedImage dartImage = ResourceManager.getInstance().getImage("dart_monkey_dart");
-        TargetedProjectile dart = new TargetedProjectile(dartImage, x, y, 1800, tx + 50, ty + 50, b);
+        int speed = 1800;
+        //speed = 10;
+        TargetedProjectile dart = new TargetedProjectile(dartImage, x, y, speed, tx + 50, ty + 50, b);
         dart.scale(1.1);
         return dart;
 	}
 	
+//	@Override
+//	public Polygon getBounds() {
+//		Polygon p = super.getBounds();
+//		p.
+//		int[] x = p.xpoints;
+//		int[] y = p.ypoints;
+//		
+//		int delta = 20;
+//		
+//		x[0] += delta;
+//		y[0] -= delta;
+//		
+//		x[1] += delta;
+//		y[1] += delta;
+//		
+//		x[2] -= delta;
+//		y[2] += delta;
+//		
+//		x[3] -= delta;
+//		y[3] -= delta;
+//		
+//		return p;
+//	}
 
+	@Override
+	public int getWidth() {
+		return super.getWidth() + BBOX_SCALE;
+	}
+	
+	@Override
+	public int getHeight() {
+		return super.getHeight() + BBOX_SCALE;
+	}
+	
 	@Override
 	public Collection<GameObject> update(int time) {
 		int velX = getVelX();
@@ -44,10 +80,10 @@ public class TargetedProjectile extends Projectile {
 			flagForDeath();
 		
 		Balloon b = intersectingBalloon();
-		System.out.println(b);
+		//System.out.println(b);
 		
 		if (b != null) {
-			b.damage(1);
+			b.damage(2);
 			flagForDeath();
 		}
 		

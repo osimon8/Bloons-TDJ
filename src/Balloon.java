@@ -21,7 +21,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	public static Color BLACK = new Color(0, 0, 0);
 	
 	
-	private static final double RED_SPEED = 40;
+	private static final double RED_SPEED = 150;
 	
 	private int hp;
 	private Point[] path;
@@ -29,6 +29,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	private double speed;
 	private boolean blastProof;
 	private boolean freezeProof;
+	private Bloon type;
 	
 	private List<Bloon> children;
 	
@@ -37,7 +38,8 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 		super(null);
 		this.path = path;
 		pathPosition = 0;
-		setUp(b);
+		type = b;
+		setUp();
 		
 		
 //		if (hp <= 5)
@@ -50,7 +52,8 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 		super(null);
 		this.path = path;
 		pathPosition = pos;
-		setUp(b);
+		type = b;
+		setUp();
 		
 		
 //		if (hp <= 5)
@@ -59,12 +62,13 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 		// TODO Auto-generated constructor stub
 	}
 	
-	private void setUp(Bloon b) {
+	private void setUp() {
 		BufferedImage image; 
 		ResourceManager res = ResourceManager.getInstance();
 		hp = 1;
 		children = new LinkedList<>();
-		Bloon[] newB;
+		Bloon[] newB = new Bloon[] {};
+		Bloon b = type;
 		
 		switch(b) {
 		case RED:
@@ -72,7 +76,6 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 			setImage(ResourceManager.tint(image, RED));
 			scale(0.75);
 			speed = RED_SPEED;
-			newB = new Bloon[] {};
 			break;
 		case BLUE:
 			image = ResourceManager.copy(res.getImage("stock_bloon"));
@@ -108,6 +111,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 			setImage(image);
 			//scale(1.5);
 			speed = RED_SPEED * 2.33;
+			newB = new Bloon[] {Bloon.ZEBRA, Bloon.ZEBRA};
 			break;
 		case CERAMIC:
 			image = ResourceManager.copy(res.getImage("ceramic_01"));
@@ -115,35 +119,43 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 			//scale(1.5);
 			speed = RED_SPEED * 2.66;
 			hp = 10;
+			newB = new Bloon[] {Bloon.RAINBOW, Bloon.RAINBOW};
 			break;
 		case BLACK:
 			image = ResourceManager.copy(res.getImage("stock_bloon"));
 			setImage(ResourceManager.tint(image, BLACK));
 			scale(0.6);
 			speed = RED_SPEED * 1.66;
+			newB = new Bloon[] {Bloon.PINK, Bloon.PINK};
 			break;
 		case WHITE:
 			image = ResourceManager.copy(res.getImage("stock_bloon"));
 			setImage(image);
 			scale(0.6);
 			speed = RED_SPEED * 2;
+			newB = new Bloon[] {Bloon.PINK, Bloon.PINK};
 			break;
 		case ZEBRA:
 			image = ResourceManager.copy(res.getImage("zebra"));
 			setImage(image);
 			//scale(1.5);
 			speed = RED_SPEED * 1.66;
+			newB = new Bloon[] {Bloon.BLACK, Bloon.WHITE};
 			break;
 		case LEAD:
 			image = ResourceManager.copy(res.getImage("lead"));
 			setImage(image);
 			scale(0.9);
 			speed = RED_SPEED;
+			newB = new Bloon[] {Bloon.BLACK, Bloon.BLACK};
 			break;
 		default:
 			break;
 		
 		}
+		
+		for (Bloon bl : newB)
+			children.add(bl);
 		
 	}
 	
@@ -152,11 +164,12 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 		List<Balloon> bs = new LinkedList<>();
 		int ctr = 0;
 		for (Bloon b : children) {
-			int ind = pathPosition - ctr;
+			int ind = pathPosition - (21 / DataLoader.FIDELITY) * ctr;
 			if (ind < 0)
 				ind = 0;
 			Balloon ball = new Balloon(b, path, ind);
 			bs.add(ball);
+			ctr++;
 		}
 		return bs;
 	}
@@ -195,7 +208,11 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	public void setPathPosition(int pos) {
 		pathPosition = pos;
 	}
-
+	
+	public int getPathPosition() {
+		return pathPosition;
+	}
+	
 	@Override
 	public Collection<GameObject> update(int time) {
 		List<GameObject> ret = null;
@@ -218,16 +235,43 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 		
 			double dist = time * speed / 1000.0;
 			
+			//int ctr = 0;
+			
 			while (dist > 0 && pathPosition < path.length - 1) {
 				Point p = path[pathPosition + 1];
 				move(p.getX(), p.getY());
 				dist -= p.distance(path[pathPosition]);
 				pathPosition++;
+				//ctr ++;
 			}
+			
+			//System.out.println(type + ": " + ctr);
 			
 			if (pathPosition == path.length - 1) {
 				//decrement life by hp * scale
 				flagForDeath();
+			}
+			else {
+				if (type.equals(Bloon.CERAMIC)) {
+					ResourceManager res = ResourceManager.getInstance();
+					if (hp <= 2) {
+						BufferedImage image = ResourceManager.copy(res.getImage("ceramic_05"));
+						setImage(image);
+					}
+					else if (hp <= 4) {
+						BufferedImage image = ResourceManager.copy(res.getImage("ceramic_04"));
+						setImage(image);
+					}
+					else if (hp <= 6) {
+						BufferedImage image = ResourceManager.copy(res.getImage("ceramic_03"));
+						setImage(image);
+					}
+					else if (hp <= 8) {
+						BufferedImage image = ResourceManager.copy(res.getImage("ceramic_02"));
+						setImage(image);
+					}
+						
+				}
 			}
 		
 		}
@@ -236,14 +280,18 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 
 	}
 	
+	public Point getProjectedLocation(int time) {
+		return path[pathPosition + (int)(20 * time * speed / (Balloon.RED_SPEED * 18))];
+	}
+	
 
 	@Override
 	public int compareTo(Balloon b) {
-		int val = b.getHP() - hp;
-		if (val != 0)
-			return val;
+//		int val = b.getHP() - hp;
+//		if (val != 0)
+//			return val;
 		
-		return 1;
+		return -pathPosition + b.pathPosition;
 		
 	}
 	
