@@ -27,7 +27,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	private Point[] path;
 	private int pathPosition;
 	private double speed;
-	private boolean blastProof;
+	private boolean blastProof = false;
 	private boolean freezeProof;
 	private Bloon type;
 	
@@ -127,6 +127,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 			scale(0.6);
 			speed = RED_SPEED * 1.66;
 			newB = new Bloon[] {Bloon.PINK, Bloon.PINK};
+			blastProof = true;
 			break;
 		case WHITE:
 			image = ResourceManager.copy(res.getImage("stock_bloon"));
@@ -141,6 +142,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 			//scale(1.5);
 			speed = RED_SPEED * 1.66;
 			newB = new Bloon[] {Bloon.BLACK, Bloon.WHITE};
+			blastProof = true;
 			break;
 		case LEAD:
 			image = ResourceManager.copy(res.getImage("lead"));
@@ -190,6 +192,9 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 		return hp;
 	}
 	
+	public boolean blastProof() {
+		return blastProof;
+	}
 	
 	public int damage(int dmg) {
 		hp -= dmg;

@@ -6,8 +6,9 @@ import java.util.Collection;
 public abstract class Projectile extends GameObject{
 
 	public final static String DART = "files/poison.png";
-	
+	public static final boolean USE_PRECISE_HITBOX = true;
 
+	private int damage = 1;
 	private int velX;
 	private int velY;
 	private Collection<Balloon> balloons;
@@ -49,6 +50,10 @@ public abstract class Projectile extends GameObject{
 		
 	public void setVelY(double y) {
 		this.velY = (int)y;
+	}
+	
+	public int getDamage() {
+		return damage;
 	}
 	
 	public Collection<Balloon> getBalloons() {

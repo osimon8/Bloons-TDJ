@@ -3,7 +3,7 @@ import java.util.Collection;
 
 public class Effect extends GameObject {
 
-	private int duration;
+	protected int duration;
 	
 	public Effect(BufferedImage img, double x, double y, double scale, int duration) {
 		super(img, x, y);

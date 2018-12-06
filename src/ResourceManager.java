@@ -154,7 +154,21 @@ public class ResourceManager {
 		
 	}
 	
+	public static BufferedImage mirrorLR(BufferedImage img) {
+		BufferedImage mirrored = new BufferedImage(img.getWidth() * 2, img.getHeight(), img.getType());
+		Graphics g = mirrored.getGraphics();
+		g.drawImage(img, 0, 0, null);
+		g.drawImage(img, 2 * img.getWidth(), 0, -img.getWidth(), img.getHeight(), null);
+		return mirrored;
+	}
 	
+	public static BufferedImage mirrorTB(BufferedImage img) {
+		BufferedImage mirrored = new BufferedImage(img.getWidth() * 2, img.getHeight(), img.getType());
+		Graphics g = mirrored.getGraphics();
+		g.drawImage(img, 0, 0, null);
+		g.drawImage(img, 0, 2 * img.getHeight(), img.getWidth(), -img.getHeight(), null);
+		return mirrored;
+	}
 }
 
 

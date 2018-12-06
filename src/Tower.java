@@ -13,37 +13,38 @@ import java.util.List;
 
 
 
-public class Tower extends GameObject {
+public abstract class Tower extends GameObject {
 
 	public enum TargetMode {FIRST, LAST, STRONG, WEAK};
 	
 	private double viewR;
 	private double blindR;
 	private Area FOV;
-	private Collection<Balloon> balloons;
+	protected Collection<Balloon> balloons;
 	private double fireRate;
 	private double fireCooldown;
 	private TargetMode mode;
 	private boolean selected = false;
 	private boolean valid = true;
+	private Area footprint;
 	
 	
-	public Tower(BufferedImage img, double x, double y, double vr, double br, Collection<Balloon> balloons) {
+	public Tower(BufferedImage img, double x, double y, double vr, double br, double fr, Collection<Balloon> balloons) {
 		super(img, x, y);
 		this.balloons = balloons;
 		viewR = vr;
 		blindR = br;
-		fireRate = 1;
+		fireRate = fr;
 		fireCooldown = 0;
 		setFOV();
 		mode = TargetMode.FIRST;
 		// TODO Auto-generated constructor stub
 	}
 
-	public static Tower makeDartMonkey(double x, double y, Collection<Balloon> balloons) {
-		return new Tower(ResourceManager.getInstance().getImage("dart_monkey_body"), x, y, 300, 0, balloons);
-	}
 	
+//	public static Tower makeBombTower(double x, double y, Collection<Balloon> balloons) {
+//		return new Tower(ResourceManager.getInstance().getImage("bomb_tower_01"), x, y, 350, 0, 0.66, balloons);
+//	}
 	
 	public void setTargetMode(TargetMode m) {
 		mode = m;
@@ -63,11 +64,12 @@ public class Tower extends GameObject {
 		double y = getY();
 		FOV = new Area(new Ellipse2D.Double(x - viewR / 2, y - viewR / 2, viewR, viewR));
 		FOV.subtract(new Area(new Ellipse2D.Double(x - blindR / 2, y - blindR / 2, blindR, blindR)));
+		int r = 3 * Math.min(getWidth(), getHeight()) / 4;
+		footprint = new Area(new Ellipse2D.Double(getX() - r / 2, getY() - r / 2, r, r));
 	}
 	
 	public Area footprint() {
-		int r = Math.min(getWidth(), getHeight());
-		return new Area(new Ellipse2D.Double(getX() - r / 2, getY() - r / 2, r, r));
+		return (Area)footprint.clone();
 	}
 	
 	public void invalidate() {
@@ -87,7 +89,7 @@ public class Tower extends GameObject {
 		setFOV();
 	}
 	
-	private List<Balloon> intersectBloon() {
+	protected List<Balloon> intersectBloon() {
 		List<Balloon> l = new LinkedList<>();
 		
 		for (Balloon b : balloons) {
@@ -100,7 +102,7 @@ public class Tower extends GameObject {
 	}
 
 	
-	private Balloon selectTarget(List<Balloon> bs) {
+	protected Balloon selectTarget(List<Balloon> bs) {
 		Collections.sort(bs);
 		switch(mode){
 		default:
@@ -117,6 +119,21 @@ public class Tower extends GameObject {
 		
 		
 	}
+	
+	
+	public double getCooldown() {
+		return fireCooldown;
+	}
+	
+	public double getFireRate() {
+		return fireRate;
+	}
+
+	public void setFireRate(double fireRate) {
+		this.fireRate = fireRate;
+	}
+
+	protected abstract Collection<GameObject> fire(Balloon target, int time); 
 	
 	@Override
 	public Collection<GameObject> update(int time) {
@@ -139,22 +156,6 @@ public class Tower extends GameObject {
 		return ret;
 
 	}
-	
-	
-	private Collection<GameObject> fire(Balloon target, int time) {
-		Collection<GameObject> ret = new LinkedList<>(); 
-//		double tx = target.getX();
-//		double ty = target.getY();
-		Point t = target.getProjectedLocation(time);
-		double tx = t.getX();
-		double ty = t.getY();
-		
-		
-		ret.add(TargetedProjectile.makeDart(getX(), getY(), tx, ty, balloons));
-		align(tx, ty);
-		return ret;
-	}
-	
 	
 	@Override
 	public void draw (Graphics g) {

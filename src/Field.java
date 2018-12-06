@@ -37,7 +37,6 @@ public class Field extends JPanel {
 	private List<Balloon> balloons;
 	private List<Tower> towers;
 	private List<Effect> effects;
-	private List<Collection> gameObjects;
 	private ResourceManager res;
 	private Point[] bloonPath;
 	private Area placementArea;
@@ -77,16 +76,27 @@ public class Field extends JPanel {
     	JButton newMonkeyButton = new JButton("New Dart Monkey");
     	newMonkeyButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	if (placingTower == null) {
-	            	placingTower = Tower.makeDartMonkey(0, 0, balloons);
+	            	placingTower = new DartMonkey(0, 0, balloons);
 	            	placingTower.visible(false);
 	            	placingTower.select();
 	            	screen.requestFocus();
-            	}
+            	
             }
         });
     	this.add(newMonkeyButton);
         
+    	JButton newBombButton = new JButton("New Bomb Tower");
+    	newBombButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+	            	placingTower = new BombTower(0, 0, balloons);
+	            	placingTower.visible(false);
+	            	placingTower.select();
+	            	screen.requestFocus();
+            	
+            }
+        });
+    	this.add(newBombButton);
+    	
 		this.addMouseMotionListener(new MouseAdapter() {
 			@Override
             public void mouseMoved(MouseEvent e) {
@@ -102,41 +112,15 @@ public class Field extends JPanel {
             		placingTower.move(e.getX(), e.getY());
             	}
 			}
+			public void mouseDragged(MouseEvent e) {
+				place(e);
+			}
         });
     	
 		this.addMouseListener(new MouseAdapter() {
 			@Override
             public void mouseClicked(MouseEvent e) {
-            	if (placingTower != null && placingTower.valid()) {
-            		towers.add(placingTower);
-	            	removeArea(placingTower);
-	            	if (selectedTower != null)
-	            		selectedTower.deselect();
-	            	selectedTower = placingTower;
-            		placingTower = null;
-            	}
-            	else {
-            		boolean found = false;
-            		for (Tower t : towers) {
-            			if (t.getBounds().contains(e.getPoint())) {
-            				if (selectedTower != null) {
-            					selectedTower.deselect();
-            				}
-            				t.select();
-            				selectedTower = t;
-            				found = true;
-            				break;
-            			}
-            			
-            		}
-            		if (!found) {
-            			if (selectedTower != null) {
-            				selectedTower.deselect();
-            			}
-            			selectedTower = null;
-            		}
-            	}
-            		
+					place(e);
 			}
         });
 		
@@ -156,32 +140,9 @@ public class Field extends JPanel {
         });
         timer.start(); // MAKE SURE TO START THE TIMER!
 
-        // Enable keyboard focus on the court area.
-        // When this component has the keyboard focus, key events are handled by its key listener.
+
         setFocusable(true);
 
-        // This key listener allows the square to move as long as an arrow key is pressed, by
-        // changing the square's velocity accordingly. (The tick method below actually moves the
-        // square.)
-//        addKeyListener(new KeyAdapter() {
-//            public void keyPressed(KeyEvent e) {
-//                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-//                    square.setVx(-SQUARE_VELOCITY);
-//                } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-//                    square.setVx(SQUARE_VELOCITY);
-//                } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-//                    square.setVy(SQUARE_VELOCITY);
-//                } else if (e.getKeyCode() == KeyEvent.VK_UP) {
-//                    square.setVy(-SQUARE_VELOCITY);
-//                }
-//            }
-//
-//            public void keyReleased(KeyEvent e) {
-//                square.setVx(0);
-//                square.setVy(0);
-//            }
-//        });
-        
         Image img = null;
         
         try {
@@ -213,15 +174,10 @@ public class Field extends JPanel {
 			e1.printStackTrace();
 		}
         
-        gameObjects = new LinkedList<>();
         projectiles = new LinkedList<>();
         effects = new LinkedList<>();
         towers = new LinkedList<>();
         balloons = new LinkedList<>();
-        
-        
-        gameObjects.add(projectiles);
-        gameObjects.add(balloons);
         
         
 //        BufferedImage dartImage = DataLoader.loadImage(Projectile.DART);
@@ -250,7 +206,7 @@ public class Field extends JPanel {
         res = ResourceManager.getInstance();
         
         //towers.add(new Tower(res.getImage("dart_monkey_body"), 1000.0, 100.0, 300.0, 100, balloons));
-        towers.add(Tower.makeDartMonkey(1000, 50, balloons));
+        towers.add(new DartMonkey(1000, 50, balloons));
         
 //
 //
@@ -268,6 +224,38 @@ public class Field extends JPanel {
         
     }
 
+    private void place(MouseEvent e) {
+    	if (placingTower != null && placingTower.valid()) {
+    		towers.add(placingTower);
+        	removeArea(placingTower);
+        	if (selectedTower != null)
+        		selectedTower.deselect();
+        	selectedTower = placingTower;
+    		placingTower = null;
+    	}
+    	else {
+    		boolean found = false;
+    		for (Tower t : towers) {
+    			if (t.getBounds().contains(e.getPoint())) {
+    				if (selectedTower != null) {
+    					selectedTower.deselect();
+    				}
+    				t.select();
+    				selectedTower = t;
+    				found = true;
+    				break;
+    			}
+    			
+    		}
+    		if (!found) {
+    			if (selectedTower != null) {
+    				selectedTower.deselect();
+    			}
+    			selectedTower = null;
+    		}
+    	}
+    }
+    
     /**
      * (Re-)set the game to its initial state.
      */
@@ -313,62 +301,60 @@ public class Field extends JPanel {
         if (playing) {
 	
         	List<GameObject> deaths = new LinkedList<>();
+        	List<GameObject> temp = new LinkedList<>();
         	
         	int deltaT = (int)(System.currentTimeMillis() - lastTime);
         	//System.out.println(deltaT);
         	for (GameObject t : towers) {
         		//o.update(INTERVAL);
-        		Collection<GameObject> projs = t.update(deltaT);
-        		if (projs != null) {
-	        		for (GameObject o : projs) {
-	        			projectiles.add((Projectile) o);
-	        		}
-        		}
+        		Collection<GameObject> newStuff = t.update(deltaT);
+        		if (newStuff != null)
+        			temp.addAll(newStuff);
         		//System.out.println(balloons);
         		if (!t.alive()) {
         			deaths.add(t);
         		}
         	}
         	
+        	addNewGameObjects(temp);
+        	
         	for (GameObject o : projectiles) {
         		//o.update(INTERVAL);
-        		o.update(deltaT);
+        		Collection<GameObject> newStuff = o.update(deltaT);
+        		if (newStuff != null)
+        			temp.addAll(newStuff);
         		//System.out.println(balloons);
         		if (!o.alive()) {
         			deaths.add(o);
         		}
         	}
         	
-        	List<Balloon> newBalloons = new LinkedList<>();
+        	addNewGameObjects(temp);
         	
         	for (GameObject b : balloons) {
         		//o.update(INTERVAL);
         		Collection<GameObject> newStuff = b.update(deltaT);
-        		if (newStuff != null) {
-	        		for (GameObject o : newStuff) {
-	        			if (o instanceof Balloon)
-	        				newBalloons.add((Balloon) o);
-	        			else if (o instanceof Effect)
-	        				effects.add((Effect) o);
-	        		}
-        		}
-        		//System.out.println(balloons);
+        		if (newStuff != null)
+        			temp.addAll(newStuff);
         		if (!b.alive()) {
         			deaths.add(b);
         		}
         	}
         	
-        	balloons.addAll(newBalloons);
+        	addNewGameObjects(temp);
         	
         	for (GameObject o : effects) {
         		//o.update(INTERVAL);
-        		o.update(deltaT);
+        		Collection<GameObject> newStuff = o.update(deltaT);
+        		if (newStuff != null)
+        			temp.addAll(newStuff);
         		//System.out.println(balloons);
         		if (!o.alive()) {
         			deaths.add(o);
         		}
         	}
         	
+        	addNewGameObjects(temp);
             
             for (GameObject o : deaths) {
             	if (o instanceof Projectile)
@@ -381,10 +367,7 @@ public class Field extends JPanel {
             		effects.remove(o);
             }
             
-            
-            
 
-            
             // update the display
             //paintImmediately(getBounds());
             repaint();
@@ -402,11 +385,11 @@ public class Field extends JPanel {
     	for (Tower t : towers) {
     		t.draw(g);
     	}
-    	for (Projectile p : projectiles) {
-    		p.draw(g);
-    	}
     	for (Balloon b : balloons) {
     		b.draw(g);
+    	}
+    	for (Projectile p : projectiles) {
+    		p.draw(g);
     	}
     	for (Effect e : effects) {
     		e.draw(g);
@@ -418,6 +401,23 @@ public class Field extends JPanel {
          
 
     
+    private void addNewGameObjects(Collection<GameObject> stuff) {
+    	if (stuff != null) {
+	        for (GameObject o : stuff) {
+	        	if (o instanceof Projectile)
+	        		projectiles.add((Projectile) o);
+	        	else if (o instanceof Balloon) 
+	        		balloons.add((Balloon) o);
+	        	else if (o instanceof Tower) 
+	        		towers.add((Tower) o);
+	        	else if (o instanceof Effect) 
+	        		effects.add((Effect) o);
+	        }
+	        stuff.clear();
+    	}
+    }
+    
+
     private void removeArea(Tower t) {
     	placementArea.subtract(t.footprint());
     }
