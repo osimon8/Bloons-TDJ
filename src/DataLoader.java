@@ -30,6 +30,7 @@ public class DataLoader {
 
 	
 	public static final int FIDELITY = 1; //how smooth the path will be, 1 is smoothest, this is included to increase load speed
+	public final static double SCALE = 1;
 	
 	public DataLoader() {
 		// TODO Auto-generated constructor stub
@@ -51,8 +52,8 @@ public class DataLoader {
 			line = line.trim();
 			Scanner sc = new Scanner(line); 
 			sc.useDelimiter(",");
-			int x = sc.nextInt();
-			int y = sc.nextInt();
+			int x = (int)(SCALE * sc.nextInt());
+			int y = (int)(SCALE * sc.nextInt());
 
 			Point p = new Point(x, y);
 			data[i] = p;
@@ -108,7 +109,10 @@ public class DataLoader {
 	
     public static BufferedImage loadImage(String path){
         try {
-        	return ImageIO.read(new File(path));
+        	BufferedImage img = ImageIO.read(new File(path));
+        	if (img == null || SCALE == 1)
+        		return img;
+        	return ResourceManager.scaleImage(img, SCALE, SCALE);
         } 
         catch (IOException e) {
             return null;

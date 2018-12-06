@@ -53,7 +53,7 @@ public class ResourceManager {
 		if (data == null)
 			throw new IllegalArgumentException("Error - Sprite name \"" +  name + "\" not found");
 
-		BufferedImage img = inGame.getSubimage(data[0], data[1], data[2], data[3]);
+		BufferedImage img = inGame.getSubimage((int) (DataLoader.SCALE * data[0]), (int) (DataLoader.SCALE * data[1]), (int) (DataLoader.SCALE * data[2]), (int) (DataLoader.SCALE * data[3]));
 
 		
 		//use this for creating new image w/o reference to whole sprite sheet

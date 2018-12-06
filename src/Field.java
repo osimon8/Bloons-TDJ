@@ -53,7 +53,7 @@ public class Field extends JPanel {
     // Update interval for timer, in milliseconds
     
     
-    public static final int INTERVAL = 16;
+    public static final int INTERVAL = 10; //16 is 60 UPS, slower computers need it be lower to keep up
 
     private static long lastTime = 0;
     private long elapsedTime;
@@ -143,29 +143,33 @@ public class Field extends JPanel {
 
         setFocusable(true);
 
-        Image img = null;
+       // BufferedImage img = null;
         
-        try {
-        	img = ImageIO.read(new File("files/Spinny.png"));
-            background = img;
-            width = background.getWidth(null);
-            height = background.getHeight(null);
-        } 
-        catch (IOException e) {
-            System.out.println("Internal Error:" + e.getMessage());
-        }
+//        try {
+//        	img = ImageIO.read(new File("files/Spinny.png"));
+//            background = img;
+//            width = background.getWidth(null);
+//            height = background.getHeight(null);
+//        } 
+//        catch (IOException e) {
+//            System.out.println("Internal Error:" + e.getMessage());
+//        }
+        
+        background = DataLoader.loadImage("files/Spinny.png");
+        width = background.getWidth(null);
+        height = background.getHeight(null);
         
         placementArea = new Area(new Rectangle(0, 0, width, height));
         
-        try {
-        	img = ImageIO.read(new File("files/Spinny.png"));
-            background = img;
-            width = background.getWidth(null);
-            height = background.getHeight(null);
-        } 
-        catch (IOException e) {
-            System.out.println("Internal Error:" + e.getMessage());
-        }
+//        try {
+//        	img = ImageIO.read(new File("files/Spinny.png"));
+//            background = img;
+//            width = background.getWidth(null);
+//            height = background.getHeight(null);
+//        } 
+//        catch (IOException e) {
+//            System.out.println("Internal Error:" + e.getMessage());
+//        }
         
         try {
 			bloonPath = DataLoader.readPathData("spinny");
@@ -375,6 +379,7 @@ public class Field extends JPanel {
             //numLoops++;
             lastTime = System.currentTimeMillis();
             //System.out.println(System.currentTimeMillis() - startTime);
+            System.out.println(deltaT);
         }
     }
 
