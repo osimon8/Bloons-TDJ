@@ -32,7 +32,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	private Bloon type;
 	
 	private List<Bloon> children;
-	
+	private List<Balloon> generatedChildren;
 	
 	public Balloon(Bloon b, Point[] path) {
 		super(null);
@@ -161,17 +161,23 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	
 	
 	public List<Balloon> getChildren() {
-		List<Balloon> bs = new LinkedList<>();
+		// this starts as null and only gets filled if necessary for efficiency 
+		if (generatedChildren == null) {
+			generatedChildren = new LinkedList<>();
+			for (Bloon b : children) {
+				Balloon ball = new Balloon(b, path, 0);
+				generatedChildren.add(ball);
+			}
+		}
 		int ctr = 0;
-		for (Bloon b : children) {
+		for (Balloon b : generatedChildren) {
 			int ind = pathPosition - (21 / DataLoader.FIDELITY) * ctr;
 			if (ind < 0)
 				ind = 0;
-			Balloon ball = new Balloon(b, path, ind);
-			bs.add(ball);
+			b.setPathPosition(ind);
 			ctr++;
 		}
-		return bs;
+		return generatedChildren;
 	}
 	
 	
@@ -207,6 +213,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	
 	public void setPathPosition(int pos) {
 		pathPosition = pos;
+		move(path[pos].x, path[pos].y);
 	}
 	
 	public int getPathPosition() {

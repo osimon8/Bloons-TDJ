@@ -55,12 +55,17 @@ public abstract class Projectile extends GameObject{
 		return balloons;
 	}
 	
-	public Balloon intersectingBalloon() {
+	public Balloon intersectingBalloon(Collection<Balloon> blacklist) {
 		for (Balloon b : balloons) {
-			if (intersects(b))
+			if ((blacklist == null || !blacklist.contains(b)) && collides(b))
 				return b;
 		}
 		return null;
+		
+	}
+	
+	public Balloon intersectingBalloon() {
+		return intersectingBalloon(null);
 		
 	}
 

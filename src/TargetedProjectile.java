@@ -2,17 +2,24 @@ import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 public class TargetedProjectile extends Projectile {
 	
-	private double distance;
-	private static final int BBOX_SCALE = 15;
+	public static final boolean USE_PRECISE_HITBOX = true;
 	
-	public TargetedProjectile(BufferedImage img, double x, double y, int speed, double targetX, double targetY, Collection<Balloon> b) {
+	private double distance;
+	private static final int BBOX_SCALE = 0;
+	private int damage = 1;
+	private int pops = 2;
+	private List<Balloon> hits = new LinkedList<>();
+	
+	public TargetedProjectile(BufferedImage img, double x, double y, int speed, double targetX, double targetY, Collection<Balloon> b, double extra) {
 		super(img, x, y, b);
 		double dx = targetX - x;
 		double dy = targetY - y;
-		distance = Math.sqrt(dx * dx + dy * dy);
+		distance = extra + Math.sqrt(dx * dx + dy * dy);
 		double theta = Math.toRadians(align(targetX, targetY) - 90);
 		
 		setVelX(speed * Math.cos(theta));
@@ -23,36 +30,12 @@ public class TargetedProjectile extends Projectile {
 	
 	public static TargetedProjectile makeDart(double x, double y, double tx, double ty, Collection<Balloon> b){
         BufferedImage dartImage = ResourceManager.getInstance().getImage("dart_monkey_dart");
-        int speed = 1800;
-        //speed = 10;
-        TargetedProjectile dart = new TargetedProjectile(dartImage, x, y, speed, tx + 50, ty + 50, b);
+        int speed = 1000;
+        TargetedProjectile dart = new TargetedProjectile(dartImage, x, y, speed, tx, ty, b, 25);
         dart.scale(1.1);
         return dart;
 	}
 	
-//	@Override
-//	public Polygon getBounds() {
-//		Polygon p = super.getBounds();
-//		p.
-//		int[] x = p.xpoints;
-//		int[] y = p.ypoints;
-//		
-//		int delta = 20;
-//		
-//		x[0] += delta;
-//		y[0] -= delta;
-//		
-//		x[1] += delta;
-//		y[1] += delta;
-//		
-//		x[2] -= delta;
-//		y[2] += delta;
-//		
-//		x[3] -= delta;
-//		y[3] -= delta;
-//		
-//		return p;
-//	}
 
 	@Override
 	public int getWidth() {
@@ -62,6 +45,16 @@ public class TargetedProjectile extends Projectile {
 	@Override
 	public int getHeight() {
 		return super.getHeight() + BBOX_SCALE;
+	}
+	
+	@Override 
+	public Polygon getHitBox() {
+		if (USE_PRECISE_HITBOX) {
+			int w = getWidth();
+			int h = getHeight();
+			return getPolygon(getX(), getY() + 4 * h / 10, w / 2, h / 5); //make only tip of needle the hitbox
+		}
+		return super.getHitBox();
 	}
 	
 	@Override
@@ -79,17 +72,23 @@ public class TargetedProjectile extends Projectile {
 		if (distance <= 0)
 			flagForDeath();
 		
-		Balloon b = intersectingBalloon();
-		//System.out.println(b);
+		Balloon b = intersectingBalloon(hits);
 		
 		if (b != null) {
-			b.damage(2);
-			flagForDeath();
+			b.damage(damage);
+			distance += 25;
+			pops--;
+			if (pops <= 0)
+				flagForDeath();
+			else{
+				hits.add(b);
+				hits.addAll(b.getChildren());
+			}
 		}
 		
+
 		
 		return null;
-		//rotate(1);		
 		
 	}
 

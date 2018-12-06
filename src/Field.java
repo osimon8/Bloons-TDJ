@@ -6,6 +6,7 @@
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +40,7 @@ public class Field extends JPanel {
 	private List<Collection> gameObjects;
 	private ResourceManager res;
 	private Point[] bloonPath;
+	private Area placementArea;
 
     public boolean playing = false; // whether the game is running 
     private Image background;
@@ -70,7 +72,83 @@ public class Field extends JPanel {
         // time the timer triggers. We define a helper method called tick() that actually does
         // everything that should be done in a single timestep.
 
+    	final JPanel screen = this;
+    	
+    	JButton newMonkeyButton = new JButton("New Dart Monkey");
+    	newMonkeyButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	if (placingTower == null) {
+	            	placingTower = Tower.makeDartMonkey(0, 0, balloons);
+	            	placingTower.visible(false);
+	            	placingTower.select();
+	            	screen.requestFocus();
+            	}
+            }
+        });
+    	this.add(newMonkeyButton);
         
+		this.addMouseMotionListener(new MouseAdapter() {
+			@Override
+            public void mouseMoved(MouseEvent e) {
+            	if (placingTower != null) {
+            		placingTower.visible(true);
+            		Area f = placingTower.footprint();
+            		f.intersect(placementArea);
+            		
+            		if (!f.equals(placingTower.footprint()))
+            			placingTower.invalidate();
+            		else
+            			placingTower.validate();
+            		placingTower.move(e.getX(), e.getY());
+            	}
+			}
+        });
+    	
+		this.addMouseListener(new MouseAdapter() {
+			@Override
+            public void mouseClicked(MouseEvent e) {
+            	if (placingTower != null && placingTower.valid()) {
+            		towers.add(placingTower);
+	            	removeArea(placingTower);
+	            	if (selectedTower != null)
+	            		selectedTower.deselect();
+	            	selectedTower = placingTower;
+            		placingTower = null;
+            	}
+            	else {
+            		boolean found = false;
+            		for (Tower t : towers) {
+            			if (t.getBounds().contains(e.getPoint())) {
+            				if (selectedTower != null) {
+            					selectedTower.deselect();
+            				}
+            				t.select();
+            				selectedTower = t;
+            				found = true;
+            				break;
+            			}
+            			
+            		}
+            		if (!found) {
+            			if (selectedTower != null) {
+            				selectedTower.deselect();
+            			}
+            			selectedTower = null;
+            		}
+            	}
+            		
+			}
+        });
+		
+		this.addKeyListener(new KeyAdapter() {
+			@Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) { 
+                    placingTower = null;
+                }
+            	}
+            });
+    	
         Timer timer = new Timer(INTERVAL, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 tick();
@@ -116,7 +194,7 @@ public class Field extends JPanel {
             System.out.println("Internal Error:" + e.getMessage());
         }
         
-        
+        placementArea = new Area(new Rectangle(0, 0, width, height));
         
         try {
         	img = ImageIO.read(new File("files/Spinny.png"));
@@ -171,7 +249,8 @@ public class Field extends JPanel {
 //        projectiles.add(TargetedProjectile.makeDart(500, 500, 800, 200)); //NE
         res = ResourceManager.getInstance();
         
-        towers.add(new Tower(res.getImage("dart_monkey_body"), 1000.0, 100.0, 300.0, 100, balloons));
+        //towers.add(new Tower(res.getImage("dart_monkey_body"), 1000.0, 100.0, 300.0, 100, balloons));
+        towers.add(Tower.makeDartMonkey(1000, 50, balloons));
         
 //
 //
@@ -219,6 +298,7 @@ public class Field extends JPanel {
             	
         	    Balloon b = new Balloon(bloons[n], bloonPath);
         	    balloons.add(b);
+        	    b.setPathPosition(0);
 
             }
         });
@@ -331,9 +411,18 @@ public class Field extends JPanel {
     	for (Effect e : effects) {
     		e.draw(g);
     	}
+    	
+    	if (placingTower != null)
+    		placingTower.draw(g);
     }
          
 
+    
+    private void removeArea(Tower t) {
+    	placementArea.subtract(t.footprint());
+    }
+    
+    
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(width, height);
