@@ -6,6 +6,8 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
@@ -15,13 +17,17 @@ public class ResourceManager {
 
 	
 	private Map<String, int[]> sprites;
-	private BufferedImage inGame;
+	private Map<String, List<String>> animations;
+ 	private BufferedImage inGame;
 	private static ResourceManager instance;
 	
+	@SuppressWarnings("unchecked")
 	private ResourceManager() {
 		
 		try {
-			sprites = DataLoader.parseXML("files/InGame.xml");
+			Object[] data = DataLoader.parseXML("files/InGame.xml");
+			sprites = (Map<String, int[]>) data[0];
+			animations = (Map<String, List<String>>) data[1];
 			inGame = DataLoader.loadImage("files/InGame.png");
 		} catch (IOException | XMLStreamException e) {
 			// TODO Auto-generated catch block
@@ -62,6 +68,33 @@ public class ResourceManager {
 		return img;
 		
 	}
+	
+	public List<BufferedImage> getAnimation(String name) {
+		
+		List<String> cells = animations.get(name);
+		List<BufferedImage> anim = new LinkedList<>();
+		//List<img>
+		
+		if (cells == null)
+			throw new IllegalArgumentException("Error - Animation name \"" +  name + "\" not found");
+		
+		for (String cell : cells) {
+			int[] data = getSprite(cell);
+			
+			if (data == null)
+				throw new IllegalArgumentException("Error - Sprite name \"" +  name + "\" not found");
+
+			BufferedImage img = inGame.getSubimage((int) (DataLoader.SCALE * data[0]), (int) (DataLoader.SCALE * data[1]), (int) (DataLoader.SCALE * data[2]), (int) (DataLoader.SCALE * data[3]));
+			anim.add(img);
+
+		}
+		
+		
+		//return img;
+		return anim;
+		
+	}
+	
 
 
 	public static BufferedImage tint(BufferedImage image, Color color) {
@@ -163,10 +196,10 @@ public class ResourceManager {
 	}
 	
 	public static BufferedImage mirrorTB(BufferedImage img) {
-		BufferedImage mirrored = new BufferedImage(img.getWidth() * 2, img.getHeight(), img.getType());
+		BufferedImage mirrored = new BufferedImage(img.getWidth(), img.getHeight() * 2, img.getType());
 		Graphics g = mirrored.getGraphics();
 		g.drawImage(img, 0, 0, null);
-		g.drawImage(img, 0, 2 * img.getHeight(), img.getWidth(), -img.getHeight(), null);
+		g.drawImage(img, 0, img.getHeight() * 2, img.getWidth(), -img.getHeight(), null);
 		return mirrored;
 	}
 }

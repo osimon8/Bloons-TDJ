@@ -97,6 +97,18 @@ public class Field extends JPanel {
         });
     	this.add(newBombButton);
     	
+    	JButton newTackButton = new JButton("New Tack Shooter");
+    	newTackButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+	            	placingTower = new TackShooter(0, 0, balloons);
+	            	placingTower.visible(false);
+	            	placingTower.select();
+	            	screen.requestFocus();
+            	
+            }
+        });
+    	this.add(newTackButton);
+    	
 		this.addMouseMotionListener(new MouseAdapter() {
 			@Override
             public void mouseMoved(MouseEvent e) {
@@ -379,7 +391,7 @@ public class Field extends JPanel {
             //numLoops++;
             lastTime = System.currentTimeMillis();
             //System.out.println(System.currentTimeMillis() - startTime);
-            System.out.println(deltaT);
+            //System.out.println(deltaT);
         }
     }
 

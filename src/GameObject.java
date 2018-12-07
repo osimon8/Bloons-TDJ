@@ -9,6 +9,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.List;
 
 public abstract class GameObject {
 
@@ -16,11 +17,15 @@ public abstract class GameObject {
 	private double y;
 	private double rotation = 0;
 	private BufferedImage img;
+	private List<BufferedImage> animation;
+	private int animDuration = 0;
+	private int animTime = -1;
 	private boolean alive = true;
 	private double scaleX = 1;
 	private double scaleY = 1;
 	private boolean visible = true;
 		
+	
 	
 	public GameObject(BufferedImage img, double x, double y) {
 		this.x = x;
@@ -93,6 +98,55 @@ public abstract class GameObject {
 	
 	public BufferedImage getImage() {
 		return ResourceManager.copy(img);
+	}
+	
+	public void setAnimation(List<BufferedImage> imgs, int length) {
+		animation = imgs;
+		setImage(animation.get(0));
+		this.animTime = -1;
+		this.animDuration = length;
+	}
+	
+	public void removeAnimation() {
+		animation = null;
+		this.animTime = -1;
+		this.animDuration = 0;
+	}
+	
+	public List<BufferedImage> getAnimation() {
+		return animation;
+	}
+	
+	public BufferedImage getAnimation(int i) {
+		return animation.get(i);
+	}
+	
+	public int getAnimationTime() {
+		return animTime;
+	}
+	
+	public int getAnimationLength() {
+		return animDuration;
+	}
+	
+	public boolean animated() {
+		return animation != null;
+	}
+	
+	public boolean animating() {
+		return animTime > -1;
+	}
+	
+	public void animate() {
+		animTime = 0;
+	}
+	
+	public void terminateAnimation() {
+		if (animated() && animating()) {
+			animTime = -1;
+			setImage(animation.get(0));
+		}
+
 	}
 	
 	public void scale(double sx, double sy) {
@@ -221,7 +275,25 @@ public abstract class GameObject {
 		g.setColor(c);
 	}
 
+	
+	public boolean progressAnimation(int time) {
+		if (animated()  && animating()) {
+			animTime += time;
+			if (animTime >= animDuration) {
+				terminateAnimation();
+			}
+			else {
+				setImage(animation.get(1 + (int) ((animation.size() - 1) * (1.0 * animTime / animDuration))));
+			}
+		}
+		return animated();
+
+		
+	}
+	
 	public void draw(Graphics g) {
+		
+		
 		
 		if (visible) {
 			Graphics2D g2d = (Graphics2D) g;
@@ -252,7 +324,10 @@ public abstract class GameObject {
 	
 	
 	
-	public abstract Collection<GameObject> update(int time);		
+	public abstract Collection<GameObject> update(int time);
+		
+	
+		
 
 	
 

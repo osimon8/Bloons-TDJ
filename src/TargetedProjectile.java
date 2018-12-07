@@ -42,6 +42,7 @@ public class TargetedProjectile extends Projectile {
 	
 	@Override
 	public Collection<GameObject> update(int time) {
+		progressAnimation(time);
 		int velX = getVelX();
 		int velY = getVelY();
 		

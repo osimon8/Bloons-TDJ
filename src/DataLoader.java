@@ -8,7 +8,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -72,7 +75,7 @@ public class DataLoader {
 	}
 	
 	
-	public static Map<String, int[]> parseXML(String filename) throws IOException, XMLStreamException {
+	public static Object[] parseXML(String filename) throws IOException, XMLStreamException {
 		
 		
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -81,7 +84,11 @@ public class DataLoader {
         streamReader.nextTag(); // Advance to "book" element
         streamReader.nextTag(); // Advance to "person" element
 
-        Map<String, int[]> data = new HashMap<>();
+        Map<String, int[]> sprites = new HashMap<>();
+        Map<String, List<String>> animations = new HashMap<>();
+        boolean inAnimation = false;
+        List<String> animList = new LinkedList<>();
+        String animName ="";
         
         while (streamReader.hasNext()) {
             if (streamReader.isStartElement()) {
@@ -92,17 +99,33 @@ public class DataLoader {
                 	int[] temp = new int[8];
                 	for (int i = 1; i <= 8; i ++)
                 		temp[i - 1] = Integer.parseInt(streamReader.getAttributeValue(i));
-                	data.put(streamReader.getAttributeValue(0), temp);
+                	String name = streamReader.getAttributeValue(0);
+                	sprites.put(name, temp);
+                	if (inAnimation) {
+                		animList.add(name);
+                	}
                     break;
                 }
-
+                case "Animation" : {
+                	inAnimation = true;
+                	animName = streamReader.getAttributeValue(0);
+                	break;
+                }
                 }
             }
+            else if (streamReader.isEndElement() && streamReader.getLocalName().equals("Animation")) {
+            	inAnimation = false;
+            	List<String> newStuff = new LinkedList<>();
+            	newStuff.addAll(animList);
+            	animations.put(animName, newStuff);
+            	animList.clear();
+            }
+            
+            
             streamReader.next();
         }
         
-
-		return data;
+		return new Object[] {sprites, animations};
 		
 	}
 	

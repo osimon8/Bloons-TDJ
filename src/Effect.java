@@ -17,6 +17,7 @@ public class Effect extends GameObject {
 	
 	@Override
 	public Collection<GameObject> update(int time) {
+		progressAnimation(time);
 		if (duration <= 0)
 			flagForDeath();
 		duration -= time;

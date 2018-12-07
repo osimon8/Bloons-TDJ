@@ -3,6 +3,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -302,9 +303,34 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 //		int val = b.getHP() - hp;
 //		if (val != 0)
 //			return val;
-		
+		int pathDiff = pathPosition - b.pathPosition;
+		if (pathDiff == 0)
+			return this == b ? 0 : 1;
 		return -pathPosition + b.pathPosition;
 		
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (blastProof ? 1231 : 1237);
+		result = prime * result + ((children == null) ? 0 : children.hashCode());
+		result = prime * result + (freezeProof ? 1231 : 1237);
+		result = prime * result + ((generatedChildren == null) ? 0 : generatedChildren.hashCode());
+		result = prime * result + hp;
+		result = prime * result + Arrays.hashCode(path);
+		result = prime * result + pathPosition;
+		long temp;
+		temp = Double.doubleToLongBits(speed);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return this == obj;
 	}
 	
 

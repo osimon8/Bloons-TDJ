@@ -4,16 +4,14 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Dart extends TargetedProjectile {
+public class Tack extends TargetedProjectile {
 
-	private int pops = 2;
 	protected List<Balloon> hits = new LinkedList<>();
 	private static int speed = (int) (1000 * DataLoader.SCALE);
-	private static double extra = 50;
 	
-	public Dart(double x, double y, double targetX, double targetY, Collection<Balloon> b) {
-		super(ResourceManager.getInstance().getImage("dart_monkey_dart"), x, y, speed, targetX, targetY, b, extra);
-        this.scale(1.1);
+	public Tack(double x, double y, double targetX, double targetY, Collection<Balloon> b) {
+		super(ResourceManager.getInstance().getImage("tack_shooter_tack"), x, y, speed, targetX, targetY, b, 0);
+        this.scale(1);
 	}
 	
 	@Override 
@@ -34,14 +32,7 @@ public class Dart extends TargetedProjectile {
 		
 		if (b != null) {
 			b.damage(getDamage());
-			increaseDistance(25);
-			pops--;
-			if (pops <= 0)
-				flagForDeath();
-			else{
-				hits.add(b);
-				hits.addAll(b.getChildren());
-			}
+			flagForDeath();
 		}
 		return null;
 	}

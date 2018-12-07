@@ -7,7 +7,7 @@ import java.util.List;
 public class DartMonkey extends Tower {
 
 	public DartMonkey(double x, double y, Collection<Balloon> balloons) {
-		super(ResourceManager.getInstance().getImage("dart_monkey_body"), x, y, 300, 0, 1, balloons);
+		super(ResourceManager.getInstance().getImage("dart_monkey_body"), x, y, DataLoader.SCALE * 300, 0, 1, balloons);
 		// TODO Auto-generated constructor stub
 	}
 	

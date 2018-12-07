@@ -27,6 +27,7 @@ public abstract class Tower extends GameObject {
 	private boolean selected = false;
 	private boolean valid = true;
 	private Area footprint;
+	private static double baseFireRate = 1;
 	
 	
 	public Tower(BufferedImage img, double x, double y, double vr, double br, double fr, Collection<Balloon> balloons) {
@@ -34,9 +35,10 @@ public abstract class Tower extends GameObject {
 		this.balloons = balloons;
 		viewR = vr;
 		blindR = br;
-		fireRate = fr;
-		fireCooldown = 0;
-		setFOV();
+		fireRate = baseFireRate * fr;
+		fireCooldown = 500 / fireRate;
+		if (img != null)
+			setFOV();
 		mode = TargetMode.FIRST;
 		// TODO Auto-generated constructor stub
 	}
@@ -89,15 +91,26 @@ public abstract class Tower extends GameObject {
 		setFOV();
 	}
 	
+	@Override
+	public void setImage(BufferedImage img) {
+		super.setImage(img);
+		setFOV();
+	}
+	
 	protected List<Balloon> intersectBloon() {
+		//long t = System.nanoTime();
 		List<Balloon> l = new LinkedList<>();
 		
 		for (Balloon b : balloons) {
-			Area a = new Area(b.getBounds());
-			a.intersect(FOV);
-			if (!a.isEmpty())
-				l.add(b);
+			if (true || !(Point.distance(getX(), getY(), b.getX(), b.getY()) > viewR + Math.max(b.getHeight(), b.getWidth()))) {
+				Area a = new Area(b.getBounds());
+				a.intersect(FOV);
+				if (!a.isEmpty())
+					l.add(b);
+			}
+
 		}
+		//System.out.println((System.nanoTime() - t) / 1000000000.0);
 		return l;
 	}
 
@@ -133,10 +146,15 @@ public abstract class Tower extends GameObject {
 		this.fireRate = fireRate;
 	}
 
+	public double getViewRadius() {
+		return viewR;
+	}
+	
 	protected abstract Collection<GameObject> fire(Balloon target, int time); 
 	
 	@Override
 	public Collection<GameObject> update(int time) {
+		progressAnimation(time);
 		Collection<GameObject> ret = null;
 		
 		if (fireCooldown <= 0) {
@@ -144,6 +162,7 @@ public abstract class Tower extends GameObject {
 			if (!intersect.isEmpty()) {
 				fireCooldown = 1000.0 / fireRate;
 				ret = fire(selectTarget(intersect), time);
+				animate();
 			}
 			
 			
