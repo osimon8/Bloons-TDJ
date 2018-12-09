@@ -7,8 +7,6 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Area;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -19,6 +17,7 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
 
 /**
  * GameCourt
@@ -40,6 +39,10 @@ public class Field extends JPanel {
 	private ResourceManager res;
 	private Point[] bloonPath;
 	private Area placementArea;
+	private JPanel bottomHUD;
+	private JPanel rightHUD;
+	private JFrame frame;
+	private JLabel towerPriceLabel;
 
     public boolean playing = false; // whether the game is running 
     private Image background;
@@ -56,13 +59,11 @@ public class Field extends JPanel {
     public static final int INTERVAL = 10; //16 is 60 UPS, slower computers need it be lower to keep up
 
     private static long lastTime = 0;
-    private long elapsedTime;
-    private long numLoops;
     
     private Tower selectedTower;
     private Tower placingTower;
     
-    public Field() {
+    public Field(JFrame f) {
         // creates border around the court area, JComponent method
         //setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
@@ -71,59 +72,63 @@ public class Field extends JPanel {
         // time the timer triggers. We define a helper method called tick() that actually does
         // everything that should be done in a single timestep.
 
+        this.frame  = f;
+        background = DataLoader.loadImage("files/Spinny.png");
+        width = background.getWidth(null);
+        height = background.getHeight(null);
+    	
+    	bottomHUD = new JPanel();
+    	rightHUD = new JPanel();
+
+    	
+        projectiles = new LinkedList<>();
+        effects = new LinkedList<>();
+        towers = new LinkedList<>();
+        balloons = new LinkedList<>();
+        
+
+        res = ResourceManager.getInstance();
+        
+    	towerPriceLabel = new JLabel();
+    	//price.setOpaque(false);
+    	towerPriceLabel.setForeground(Color.YELLOW);
+    	towerPriceLabel.setFont(towerPriceLabel.getFont().deriveFont(20F));
+    	towerPriceLabel.setVisible(true);
+    	rightHUD.add(towerPriceLabel);
+    	
+    	bottomHUD.setBackground(new Color(153, 102, 51));
+    	//bottomHUD.setLayout(null);
+    	bottomHUD.setPreferredSize(new Dimension(width, 100));
+    	rightHUD.setBackground(new Color(153, 102, 51));
+    	rightHUD.setPreferredSize(new Dimension(200, height));
+    	rightHUD.setLayout(new BoxLayout(rightHUD, BoxLayout.Y_AXIS));
+    	this.setLayout(new BorderLayout());
+    	this.add(rightHUD, BorderLayout.EAST);
+    	this.add(bottomHUD, BorderLayout.SOUTH);
+    	rightHUD.setVisible(true);
+    	bottomHUD.setVisible(true);
+    	bottomHUD.setOpaque(true);
+
+
+    	
     	final JPanel screen = this;
     	
-    	JButton newMonkeyButton = new JButton("New Dart Monkey");
-    	newMonkeyButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-	            	placingTower = new DartMonkey(0, 0, balloons);
-	            	placingTower.visible(false);
-	            	placingTower.select();
-	            	screen.requestFocus();
-            	
-            }
-        });
-    	this.add(newMonkeyButton);
+    	JButton newMonkeyButton = new TowerButton(this, new DartMonkey(0, 0, balloons));
+    	rightHUD.add(newMonkeyButton);
         
-    	JButton newBombButton = new JButton("New Bomb Tower");
-    	newBombButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-	            	placingTower = new BombTower(0, 0, balloons);
-	            	placingTower.visible(false);
-	            	placingTower.select();
-	            	screen.requestFocus();
-            	
-            }
-        });
-    	this.add(newBombButton);
+    	JButton newBombButton = new TowerButton(this, new BombTower(0, 0, balloons));
+    	rightHUD.add(newBombButton);
     	
-    	JButton newTackButton = new JButton("New Tack Shooter");
-    	newTackButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-	            	placingTower = new TackShooter(0, 0, balloons);
-	            	placingTower.visible(false);
-	            	placingTower.select();
-	            	screen.requestFocus();
-            	
-            }
-        });
-    	this.add(newTackButton);
+    	JButton newTackButton = new TowerButton(this, new TackShooter(0, 0, balloons));
+    	rightHUD.add(newTackButton);
     	
-    	JButton newIceButton = new JButton("New Ice Tower");
-    	newIceButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-	            	placingTower = new IceTower(0, 0, balloons);
-	            	placingTower.visible(false);
-	            	placingTower.select();
-	            	screen.requestFocus();
-            	
-            }
-        });
-    	this.add(newIceButton);
+    	JButton newIceButton = new TowerButton(this, new IceTower(0, 0, balloons));
+    	rightHUD.add(newIceButton);
     	
 		this.addMouseMotionListener(new MouseAdapter() {
 			@Override
             public void mouseMoved(MouseEvent e) {
+        		towerPriceLabel.setText("");
             	if (placingTower != null) {
             		placingTower.visible(true);
             		Area f = placingTower.footprint();
@@ -167,33 +172,9 @@ public class Field extends JPanel {
 
         setFocusable(true);
 
-       // BufferedImage img = null;
-        
-//        try {
-//        	img = ImageIO.read(new File("files/Spinny.png"));
-//            background = img;
-//            width = background.getWidth(null);
-//            height = background.getHeight(null);
-//        } 
-//        catch (IOException e) {
-//            System.out.println("Internal Error:" + e.getMessage());
-//        }
-        
-        background = DataLoader.loadImage("files/Spinny.png");
-        width = background.getWidth(null);
-        height = background.getHeight(null);
         
         placementArea = new Area(new Rectangle(0, 0, width, height));
         
-//        try {
-//        	img = ImageIO.read(new File("files/Spinny.png"));
-//            background = img;
-//            width = background.getWidth(null);
-//            height = background.getHeight(null);
-//        } 
-//        catch (IOException e) {
-//            System.out.println("Internal Error:" + e.getMessage());
-//        }
         
         try {
 			bloonPath = DataLoader.readPathData("spinny");
@@ -202,53 +183,8 @@ public class Field extends JPanel {
 			e1.printStackTrace();
 		}
         
-        projectiles = new LinkedList<>();
-        effects = new LinkedList<>();
-        towers = new LinkedList<>();
-        balloons = new LinkedList<>();
-        
-        
-//        BufferedImage dartImage = DataLoader.loadImage(Projectile.DART);
-//        dartImage = ResourceManager.resizeImage(dartImage, 40, 10);
-//
-//        Projectile dart = new TargetedProjectile(dartImage, 100, 100, 160, 200, 200);
-//        
-//        
-//        
-//        projectiles.add(dart);
-        
-        
-        //lots of test darts for projectile motion
-        
-//        projectiles.add(TargetedProjectile.makeDart(500, 500, 500, 100)); //N
-//        projectiles.add(TargetedProjectile.makeDart(500, 500, 500, 900)); //S
-//        projectiles.add(TargetedProjectile.makeDart(500, 500, 100, 500)); //W
-//        projectiles.add(TargetedProjectile.makeDart(500, 500, 900, 500)); //E
-//        
-//        
-//        
-//        projectiles.add(TargetedProjectile.makeDart(500, 500, 800, 800)); //SE
-//        projectiles.add(TargetedProjectile.makeDart(500, 500, 200, 200)); //NW
-//        projectiles.add(TargetedProjectile.makeDart(500, 500, 200, 800)); //SW
-//        projectiles.add(TargetedProjectile.makeDart(500, 500, 800, 200)); //NE
-        res = ResourceManager.getInstance();
-        
-        //towers.add(new Tower(res.getImage("dart_monkey_body"), 1000.0, 100.0, 300.0, 100, balloons));
-        towers.add(new DartMonkey(1000, 50, balloons));
-        
-//
-//
-//        
-//        BufferedImage ig = res.getImage("stock_bloon");
-//        try {
-//
-//            File f = new File("files/stock.png");
-//            //f.createNewFile();
-//			ImageIO.write(ig, "png", f);
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
+
+
         
     }
 
@@ -269,6 +205,11 @@ public class Field extends JPanel {
     					selectedTower.deselect();
     				}
     				t.select();
+    				Upgrade u = new Upgrade(ResourceManager.getInstance().getImage("stock_bloon"), "Poison", 400, "this is a thing");
+					bottomHUD.removeAll();
+    				bottomHUD.add(u.getComponent());
+    				frame.validate();
+    				//u.getComponent().paintImmediately(u.getComponent().getBounds());
     				selectedTower = t;
     				found = true;
     				break;
@@ -278,6 +219,7 @@ public class Field extends JPanel {
     		if (!found) {
     			if (selectedTower != null) {
     				selectedTower.deselect();
+					bottomHUD.removeAll();
     			}
     			selectedTower = null;
     		}
@@ -296,25 +238,18 @@ public class Field extends JPanel {
         // Make sure that this component has the keyboard focus
         requestFocusInWindow();
         lastTime = System.currentTimeMillis();
-        elapsedTime = 0;
-        numLoops = 0;
         Bloon[] bloons = Bloon.values();	
         Random r = new Random();
         
+        
         Timer timer = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	//System.out.println("tick");
-                //int hp = (int) (Math.random() * 5 + 1);
-
-        			//Image img = DataLoader.loadImage(Projectile.DART).getScaledInstance(40, 10, 0);
-                //BufferedImage img = res.getImage("stock_bloon");
-               // System.out.println(img);
             	int n = r.nextInt(bloons.length);
-            	//n=0;
             	
         	    Balloon b = new Balloon(bloons[n], bloonPath);
         	    balloons.add(b);
         	    b.setPathPosition(0);
+                //System.gc();
 
             }
         });
@@ -405,29 +340,7 @@ public class Field extends JPanel {
             //System.out.println(System.currentTimeMillis() - startTime);
             //System.out.println(deltaT);
         }
-    }
-
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.drawImage(background, 0, 0, null);
-    	for (Tower t : towers) {
-    		t.draw(g);
-    	}
-    	for (Balloon b : balloons) {
-    		b.draw(g);
-    	}
-    	for (Projectile p : projectiles) {
-    		p.draw(g);
-    	}
-    	for (Effect e : effects) {
-    		e.draw(g);
-    	}
-    	
-    	if (placingTower != null)
-    		placingTower.draw(g);
-    }
-         
+    }  
 
     
     private void addNewGameObjects(Collection<GameObject> stuff) {
@@ -447,6 +360,40 @@ public class Field extends JPanel {
     }
     
 
+	@Override 
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+        g.drawImage(background, 0, 0, null);
+    	for (Tower t : towers) {
+    		t.draw(g);
+    	}
+    	for (Balloon b : balloons) {
+    		b.draw(g);
+    	}
+    	for (Projectile p : projectiles) {
+    		p.draw(g);
+    	}
+    	for (Effect e : effects) {
+    		e.draw(g);
+    	}
+    	
+    	if (placingTower != null)
+    		placingTower.draw(g);
+    	
+    	bottomHUD.repaint();
+//    	if (bottomHUD != null && bottomHUD.getComponentCount() > 0)
+//    		bottomHUD.getComponent(0).repaint();
+    	//rightHUD.paintAll(g);    	
+	}
+    
+	public void setPlacingTower(Tower t) {
+		placingTower = t;
+	}
+	
+	public void setTowerPriceLabel(String s) {
+		towerPriceLabel.setText(s);
+	}
+    
     private void removeArea(Tower t) {
     	placementArea.subtract(t.footprint());
     }
@@ -454,6 +401,6 @@ public class Field extends JPanel {
     
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(width, height);
+        return new Dimension(width + 200, height + 100);
     }
 }

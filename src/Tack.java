@@ -19,7 +19,7 @@ public class Tack extends TargetedProjectile {
 		if (USE_PRECISE_HITBOX) {
 			int w = getWidth();
 			int h = getHeight();
-			return getPolygon(getX(), getY() + 4 * h / 10, w / 2, h / 5); //make only tip of needle the hitbox
+			return getPolygon(getX(), getY() + 2 * h / 5, w, h / 5); //make only tip of needle the hitbox
 		}
 		return super.getHitBox();
 	}

@@ -13,7 +13,7 @@ import java.util.List;
 
 
 
-public abstract class Tower extends GameObject {
+public abstract class Tower extends GameObject implements Cloneable{
 
 	public enum TargetMode {FIRST, LAST, STRONG, WEAK};
 	
@@ -28,9 +28,11 @@ public abstract class Tower extends GameObject {
 	private boolean valid = true;
 	private Area footprint;
 	private static double baseFireRate = 1;
+	private int price;
+	private String name;
 	
 	
-	public Tower(BufferedImage img, double x, double y, double vr, double br, double fr, Collection<Balloon> balloons) {
+	public Tower(BufferedImage img, double x, double y, double vr, double br, double fr, int price, String name, Collection<Balloon> balloons) {
 		super(img, x, y);
 		this.balloons = balloons;
 		viewR = vr;
@@ -40,6 +42,8 @@ public abstract class Tower extends GameObject {
 		if (img != null)
 			setUp();
 		mode = TargetMode.FIRST;
+		this.price = price;
+		this.name = name;
 		// TODO Auto-generated constructor stub
 	}
 
@@ -47,6 +51,10 @@ public abstract class Tower extends GameObject {
 //	public static Tower makeBombTower(double x, double y, Collection<Balloon> balloons) {
 //		return new Tower(ResourceManager.getInstance().getImage("bomb_tower_01"), x, y, 350, 0, 0.66, balloons);
 //	}
+	
+	public Collection<Balloon> getBalloons(){
+		return balloons;
+	}
 	
 	public void setTargetMode(TargetMode m) {
 		mode = m;
@@ -93,6 +101,11 @@ public abstract class Tower extends GameObject {
 	public boolean valid() {
 		return valid;
 	}
+	
+	public int getPrice() {
+		return price;
+	}
+	
 	@Override
 	public void move(double x, double y) {
 		super.move(x, y);
@@ -162,6 +175,10 @@ public abstract class Tower extends GameObject {
 		return blindR;
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
 	protected abstract Collection<GameObject> fire(List<Balloon> intersect, int time); 
 	
 	@Override
@@ -218,6 +235,14 @@ public abstract class Tower extends GameObject {
 		
 	}
 	
-	
+	 public Object clone(){
+		    try {
+				return super.clone();
+			} catch (CloneNotSupportedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    return null;
+		  }
 
 }

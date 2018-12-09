@@ -37,7 +37,7 @@ public class Game implements Runnable {
         JPanel instructions = new JPanel();
         instructions.setPreferredSize(new Dimension(300, 300));
 
-        Field in_game = new Field();
+        Field in_game = new Field(frame);
         //in_game.setPreferredSize(new Dimension(800, 800));
         
         

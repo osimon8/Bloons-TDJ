@@ -8,7 +8,7 @@ public class BombTower extends Tower {
 
 	
 	public BombTower(double x, double y, Collection<Balloon> balloons) {
-		super(null, x, y, 175, 0, 0.66, balloons);
+		super(null, x, y, 175, 0, 0.66, 400, "Bomb Tower", balloons);
 		setAnimation(generateImages(), 100);
 		// TODO Auto-generated constructor stub
 	}

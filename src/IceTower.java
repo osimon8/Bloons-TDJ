@@ -14,14 +14,14 @@ public class IceTower extends Tower {
 	public static int duration = 500;
 	
 	public IceTower(double x, double y, Collection<Balloon> balloons) {
-		super(generateImages(), x, y, DataLoader.SCALE * viewRad, 0, 0.5, balloons);
+		super(generateImage(1), x, y, DataLoader.SCALE * viewRad, 0, 0.5, 450, "Ice Tower", balloons);
 	}
 	
 
-	private static BufferedImage generateImages() {
+	private static BufferedImage generateImage(int num) {
 		ResourceManager res = ResourceManager.getInstance();
 		
-		BufferedImage base = res.getImage("ice_tower_base_01");
+		BufferedImage base = res.getImage("ice_tower_base_0" + num);
 		base = ResourceManager.mirrorLR(base);
 		base = ResourceManager.mirrorTB(base);
 		BufferedImage monkey = res.getImage("ice_tower_monkey");
