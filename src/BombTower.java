@@ -46,6 +46,27 @@ public class BombTower extends Tower {
 		return ret;
 	}
 	
+	@Override
+	public void upgrade(Upgrade.Tier t) {
+		switch(t) {
+		case L1:
+			
+			break;
+		case L2:
+			break;
+		case R1:
+			break;
+		case R2:
+			break;
+		default:
+			break;
+		
+		
+		
+		}
+		
+	}
+	
 	
 	
 

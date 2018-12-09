@@ -1,4 +1,6 @@
 import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -16,16 +18,19 @@ public class Upgrade {
 	private String description;
 	private String name;
 	private JComponent comp;
-	
+	private Tier tier;
+	private Tower tower;
 	
 	public enum Tier{L1, L2, R1, R2};
 	
-	public Upgrade(BufferedImage img, String name, int cost, String description) {
+	public Upgrade(BufferedImage img, String name, int cost, String description, Tier tier, Tower t) {
 		this.cost = cost;
 		this.icon = img;
 		this.description = description;
 		this.name = name;
 		comp = setComponent();
+		this.tier = tier;
+		this.tower = tower;
 	}
 	
 	
@@ -86,6 +91,13 @@ public class Upgrade {
 		j.setToolTipText(description);
 		j.setOpaque(false);
 		j.setVisible(true);
+		j.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				tower.upgrade(tier);
+			}
+			
+		});
 		//j.setPreferredSize(new Dimension(icon.getWidth(), icon.getHeight()));
 		return j;
 	}
