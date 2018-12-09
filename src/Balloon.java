@@ -29,7 +29,9 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	private int pathPosition;
 	private double speed;
 	private boolean blastProof = false;
-	private boolean freezeProof;
+	private boolean freezeProof = false;
+	private boolean refreshImage = false;
+	private int freezeTimer = 0;
 	private Bloon type;
 	
 	private List<Bloon> children;
@@ -63,91 +65,132 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 		// TODO Auto-generated constructor stub
 	}
 	
-	private void setUp() {
-		BufferedImage image; 
+	private static BufferedImage getStockBloonImage(Color c) {
 		ResourceManager res = ResourceManager.getInstance();
-		hp = 1;
+		BufferedImage bloon = ResourceManager.copy(res.getImage("stock_bloon"));
+		if (c != null)
+			bloon = ResourceManager.tint(bloon, c);
+		BufferedImage highlight = res.getImage("stock_bloon_highlight");
+
+		BufferedImage img = new BufferedImage(bloon.getWidth(), bloon.getHeight(), bloon.getType());
+		Graphics g = img.getGraphics();
+	
+	    g.drawImage(bloon, 0, 0, null);
+		g.drawImage(highlight, (int)(img.getWidth() * .45), (int)(img.getHeight() / 10), null);
+		
+		return img;
+	}
+	
+	private BufferedImage getBloonImage(Bloon b) {
+		ResourceManager res = ResourceManager.getInstance();
+		switch(b) {
+		case RED:
+			return getStockBloonImage(RED);
+		case BLUE:
+			return getStockBloonImage(BLUE);
+		case GREEN:
+			return getStockBloonImage(GREEN);
+		case YELLOW:
+			return getStockBloonImage(YELLOW);
+		case PINK:
+			return getStockBloonImage(PINK);
+		case RAINBOW:
+			return ResourceManager.copy(res.getImage("rainbow"));
+		case CERAMIC:
+			if (hp <= 2) {
+				return ResourceManager.copy(res.getImage("ceramic_05"));
+			}
+			else if (hp <= 4) {
+				return ResourceManager.copy(res.getImage("ceramic_04"));
+			}
+			else if (hp <= 6) {
+				return ResourceManager.copy(res.getImage("ceramic_03"));
+			}
+			else if (hp <= 8) {
+				return ResourceManager.copy(res.getImage("ceramic_02"));
+			}
+			else
+				return ResourceManager.copy(res.getImage("ceramic_01"));
+		case BLACK:
+			return getStockBloonImage(BLACK);
+		case WHITE:
+			return getStockBloonImage(null);
+		case ZEBRA:
+			return ResourceManager.copy(res.getImage("zebra"));
+		case LEAD:
+			return ResourceManager.copy(res.getImage("lead"));
+		default:
+			return null;
+		}	
+	}
+	
+	private void setUp() {
 		children = new LinkedList<>();
 		Bloon[] newB = new Bloon[] {};
 		Bloon b = type;
+		if (b.equals(Bloon.CERAMIC))
+			hp = 10;
+		else
+			hp = 1;
+		
+		setImage(getBloonImage(b));
 		
 		switch(b) {
 		case RED:
-			image = ResourceManager.copy(res.getImage("stock_bloon"));
-			setImage(ResourceManager.tint(image, RED));
 			scale(0.75);
 			speed = RED_SPEED;
 			break;
 		case BLUE:
-			image = ResourceManager.copy(res.getImage("stock_bloon"));
-			setImage(ResourceManager.tint(image, BLUE));
 			scale(0.8);
 			speed = RED_SPEED * 1.33;
 			newB = new Bloon[] {Bloon.RED};
 			break;
 		case GREEN:
-			image = ResourceManager.copy(res.getImage("stock_bloon"));
-			setImage(ResourceManager.tint(image, GREEN));
 			scale(0.85);
 			speed = RED_SPEED * 1.66;
 			newB = new Bloon[] {Bloon.BLUE};
 			break;
 		case YELLOW:
-			image = ResourceManager.copy(res.getImage("stock_bloon"));
-			setImage(ResourceManager.tint(image, YELLOW));
 			scale(0.9);
 			speed = RED_SPEED * 3.33;
 			newB = new Bloon[] {Bloon.GREEN};
 			break;
 		case PINK:
-			image = ResourceManager.copy(res.getImage("stock_bloon"));
-			setImage(ResourceManager.tint(image, PINK));
 			scale(0.95);
 			//scale(1.4);
 			speed = RED_SPEED * 3.66;
 			newB = new Bloon[] {Bloon.YELLOW};
 			break;
 		case RAINBOW:
-			image = ResourceManager.copy(res.getImage("rainbow"));
-			setImage(image);
 			//scale(1.5);
 			speed = RED_SPEED * 2.33;
 			newB = new Bloon[] {Bloon.ZEBRA, Bloon.ZEBRA};
 			break;
 		case CERAMIC:
-			image = ResourceManager.copy(res.getImage("ceramic_01"));
-			setImage(image);
 			//scale(1.5);
 			speed = RED_SPEED * 2.66;
-			hp = 10;
 			newB = new Bloon[] {Bloon.RAINBOW, Bloon.RAINBOW};
 			break;
 		case BLACK:
-			image = ResourceManager.copy(res.getImage("stock_bloon"));
-			setImage(ResourceManager.tint(image, BLACK));
 			scale(0.6);
 			speed = RED_SPEED * 1.66;
 			newB = new Bloon[] {Bloon.PINK, Bloon.PINK};
 			blastProof = true;
 			break;
 		case WHITE:
-			image = ResourceManager.copy(res.getImage("stock_bloon"));
-			setImage(image);
 			scale(0.6);
 			speed = RED_SPEED * 2;
 			newB = new Bloon[] {Bloon.PINK, Bloon.PINK};
+			freezeProof = true;
 			break;
 		case ZEBRA:
-			image = ResourceManager.copy(res.getImage("zebra"));
-			setImage(image);
 			//scale(1.5);
 			speed = RED_SPEED * 1.66;
 			newB = new Bloon[] {Bloon.BLACK, Bloon.WHITE};
 			blastProof = true;
+			freezeProof = true;
 			break;
 		case LEAD:
-			image = ResourceManager.copy(res.getImage("lead"));
-			setImage(image);
 			scale(0.9);
 			speed = RED_SPEED;
 			newB = new Bloon[] {Bloon.BLACK, Bloon.BLACK};
@@ -193,12 +236,28 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 		return hp;
 	}
 	
+	public Bloon type() {
+		return type;
+	}
+	
 	public boolean blastProof() {
 		return blastProof;
 	}
 	
+	public void freeze(int time) {
+		if (!freezeProof) {
+			freezeTimer = time;
+			refreshImage = true;
+		}
+	}
+	
+	public boolean frozen() {
+		return freezeTimer > 0;
+	}
+	
 	public int damage(int dmg) {
 		hp -= dmg;
+		refreshImage = true;
 		
 //		if (hp < 1) {
 //			pop();
@@ -245,45 +304,52 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 		
 		
 		if (alive()) {
-		
-			double dist = time * speed / 1000.0;
+			
+
 			
 			//int ctr = 0;
 			
-			while (dist > 0 && pathPosition < path.length - 1) {
-				Point p = path[pathPosition + 1];
-				move(p.getX(), p.getY());
-				dist -= p.distance(path[pathPosition]);
-				pathPosition++;
-				//ctr ++;
+			if (frozen()) {
+				freezeTimer -= time;
+				
+				if (refreshImage) {
+					BufferedImage base = getBloonImage(type);
+					BufferedImage ice = ResourceManager.getInstance().getImage("ice_effect");
+					BufferedImage img = new BufferedImage(ice.getWidth(), ice.getHeight(), ice.getType());
+					img.getGraphics().drawImage(base, (img.getWidth() - base.getWidth()) / 2 , (img.getHeight() - base.getHeight()) / 2 , null);
+					img.getGraphics().drawImage(ice, 0, 0, null);
+					setImage(img);
+					refreshImage = false;
+				}
+
+				
+				if (freezeTimer <= 0) {
+					freezeTimer = 0;
+					refreshImage = true;
+				}
 			}
 			
-			//System.out.println(type + ": " + ctr);
-			
-			if (pathPosition == path.length - 1) {
-				//decrement life by hp * scale
-				flagForDeath();
-			}
 			else {
-				if (type.equals(Bloon.CERAMIC)) {
-					ResourceManager res = ResourceManager.getInstance();
-					if (hp <= 2) {
-						BufferedImage image = ResourceManager.copy(res.getImage("ceramic_05"));
-						setImage(image);
-					}
-					else if (hp <= 4) {
-						BufferedImage image = ResourceManager.copy(res.getImage("ceramic_04"));
-						setImage(image);
-					}
-					else if (hp <= 6) {
-						BufferedImage image = ResourceManager.copy(res.getImage("ceramic_03"));
-						setImage(image);
-					}
-					else if (hp <= 8) {
-						BufferedImage image = ResourceManager.copy(res.getImage("ceramic_02"));
-						setImage(image);
-					}
-						
+			
+				if (refreshImage) {
+					setImage(getBloonImage(type));
+					refreshImage = false;
+				}
+				
+				double dist = time * speed / 1000.0;
+				while (dist > 0 && pathPosition < path.length - 1) {
+					Point p = path[pathPosition + 1];
+					move(p.getX(), p.getY());
+					dist -= p.distance(path[pathPosition]);
+					pathPosition++;
+					//ctr ++;
+				}
+				
+				//System.out.println(type + ": " + ctr);
+				
+				if (pathPosition == path.length - 1) {
+					//decrement life by hp * scale
+					flagForDeath();
 				}
 			}
 		
@@ -332,6 +398,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	public boolean equals(Object obj) {
 		return this == obj;
 	}
+	
 	
 
 }

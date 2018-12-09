@@ -1,5 +1,6 @@
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.List;
 
 public class Effect extends GameObject {
 
@@ -11,8 +12,20 @@ public class Effect extends GameObject {
 		this.duration = duration;
 	}
 	
+	public Effect(List<BufferedImage> animation, double x, double y, double scale, int duration) {
+		super(null, x, y);
+		setAnimation(animation, duration);
+		scale(scale);
+		this.duration = duration;
+		animate();
+	}
+	
 	public static Effect makePop(double x, double y) {
 		return new Effect(ResourceManager.getInstance().getImage("pop"), x, y, 0.75, 60);
+	}
+	
+	public static Effect makeIceExplosion(double x, double y) {
+		return new Effect(ResourceManager.getInstance().getAnimation("ice_explosion"), x, y, 0.75, 60);
 	}
 	
 	@Override

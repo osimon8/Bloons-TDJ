@@ -9,7 +9,7 @@ import java.util.List;
 
 public class TackShooter extends Tower {
 
-	private static double viewRad = 200;
+	private static double viewRad = 100;
 	
 	public TackShooter(double x, double y, Collection<Balloon> balloons) {
 		super(null, x, y, DataLoader.SCALE * viewRad, 0, 0.6, balloons);
@@ -43,7 +43,8 @@ public class TackShooter extends Tower {
 		return genAnim;
 	}
 	
-	protected Collection<GameObject> fire(Balloon target, int time) {
+	@Override
+	protected Collection<GameObject> fire(List<Balloon> intersect, int time) {
 		Collection<GameObject> ret = new LinkedList<>(); 
 //		double tx = target.getX();
 //		double ty = target.getY();
@@ -52,7 +53,7 @@ public class TackShooter extends Tower {
 //		double ty = t.getY();
 		//Tack dummy = new Tack(0, 0, 0, 0, null);
 		
-		double r = getViewRadius()/2;
+		double r = getViewRadius();
 		double x = getX();
 		double y = getY();
 		double rmod = r * Math.sqrt(2) / 2;

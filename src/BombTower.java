@@ -8,7 +8,7 @@ public class BombTower extends Tower {
 
 	
 	public BombTower(double x, double y, Collection<Balloon> balloons) {
-		super(null, x, y, 350, 0, 0.66, balloons);
+		super(null, x, y, 175, 0, 0.66, balloons);
 		setAnimation(generateImages(), 100);
 		// TODO Auto-generated constructor stub
 	}
@@ -30,7 +30,9 @@ public class BombTower extends Tower {
 		return genAnim;
 	}
 	
-	protected Collection<GameObject> fire(Balloon target, int time) {
+	@Override
+	protected Collection<GameObject> fire(List<Balloon> intersect, int time) {
+		Balloon target = selectTarget(intersect);
 		Collection<GameObject> ret = new LinkedList<>(); 
 //		double tx = target.getX();
 //		double ty = target.getY();

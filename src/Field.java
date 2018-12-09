@@ -109,6 +109,18 @@ public class Field extends JPanel {
         });
     	this.add(newTackButton);
     	
+    	JButton newIceButton = new JButton("New Ice Tower");
+    	newIceButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+	            	placingTower = new IceTower(0, 0, balloons);
+	            	placingTower.visible(false);
+	            	placingTower.select();
+	            	screen.requestFocus();
+            	
+            }
+        });
+    	this.add(newIceButton);
+    	
 		this.addMouseMotionListener(new MouseAdapter() {
 			@Override
             public void mouseMoved(MouseEvent e) {

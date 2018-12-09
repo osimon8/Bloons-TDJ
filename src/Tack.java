@@ -31,7 +31,9 @@ public class Tack extends TargetedProjectile {
 		Balloon b = intersectingBalloon(hits);
 		
 		if (b != null) {
-			b.damage(getDamage());
+			if (b.type() != Bloon.LEAD && !b.frozen()) {
+				b.damage(getDamage());
+			}
 			flagForDeath();
 		}
 		return null;

@@ -19,7 +19,7 @@ public abstract class Tower extends GameObject {
 	
 	private double viewR;
 	private double blindR;
-	private Area FOV;
+	protected Area FOV;
 	protected Collection<Balloon> balloons;
 	private double fireRate;
 	private double fireCooldown;
@@ -38,7 +38,7 @@ public abstract class Tower extends GameObject {
 		fireRate = baseFireRate * fr;
 		fireCooldown = 500 / fireRate;
 		if (img != null)
-			setFOV();
+			setUp();
 		mode = TargetMode.FIRST;
 		// TODO Auto-generated constructor stub
 	}
@@ -61,13 +61,21 @@ public abstract class Tower extends GameObject {
 		selected = false;
 	}
 	
-	private void setFOV() {
+	protected void setFOV() {
 		double x = getX();
 		double y = getY();
-		FOV = new Area(new Ellipse2D.Double(x - viewR / 2, y - viewR / 2, viewR, viewR));
-		FOV.subtract(new Area(new Ellipse2D.Double(x - blindR / 2, y - blindR / 2, blindR, blindR)));
+		FOV = new Area(new Ellipse2D.Double(x - getViewRadius(), y - getViewRadius(), 2 * getViewRadius(), 2 * getViewRadius()));
+		FOV.subtract(new Area(new Ellipse2D.Double(x - getBlindRadius(), y - getBlindRadius(), 2 * getBlindRadius(), 2 * getBlindRadius())));
+	}
+	
+	private void setFootprint() {
 		int r = 3 * Math.min(getWidth(), getHeight()) / 4;
 		footprint = new Area(new Ellipse2D.Double(getX() - r / 2, getY() - r / 2, r, r));
+	}
+	
+	private void setUp() {
+		setFOV();
+		setFootprint();
 	}
 	
 	public Area footprint() {
@@ -88,13 +96,13 @@ public abstract class Tower extends GameObject {
 	@Override
 	public void move(double x, double y) {
 		super.move(x, y);
-		setFOV();
+		setUp();
 	}
 	
 	@Override
 	public void setImage(BufferedImage img) {
 		super.setImage(img);
-		setFOV();
+		setUp();
 	}
 	
 	protected List<Balloon> intersectBloon() {
@@ -150,7 +158,11 @@ public abstract class Tower extends GameObject {
 		return viewR;
 	}
 	
-	protected abstract Collection<GameObject> fire(Balloon target, int time); 
+	public double getBlindRadius() {
+		return blindR;
+	}
+	
+	protected abstract Collection<GameObject> fire(List<Balloon> intersect, int time); 
 	
 	@Override
 	public Collection<GameObject> update(int time) {
@@ -161,7 +173,7 @@ public abstract class Tower extends GameObject {
 			List<Balloon> intersect = intersectBloon();
 			if (!intersect.isEmpty()) {
 				fireCooldown = 1000.0 / fireRate;
-				ret = fire(selectTarget(intersect), time);
+				ret = fire(intersect, time);
 				animate();
 			}
 			
@@ -185,16 +197,16 @@ public abstract class Tower extends GameObject {
 			
 			if (valid) {
 				g.setColor(new Color(100, 100, 100, 155));
-				g.fillOval((int) (getX() - viewR / 2), (int) (getY() - viewR / 2), (int)viewR, (int)viewR);
+				g.fillOval((int) (getX() - viewR), (int) (getY() - viewR), (int)(2 * viewR), (int)(2 * viewR));
 				g.setColor(new Color(255, 0, 0, 70));
-				g.fillOval((int) (getX() - blindR / 2), (int) (getY() - blindR / 2), (int)blindR, (int)blindR);	
+				g.fillOval((int) (getX() - blindR), (int) (getY() - blindR), (int)(2 * blindR), (int)(2 * blindR));	
 				g.setColor(c);
 				super.draw(g);
 			}
 			else {
 				super.draw(g);
 				g.setColor(new Color(255, 0, 0, 150));
-				g.fillOval((int) (getX() - viewR / 2), (int) (getY() - viewR / 2), (int)viewR, (int)viewR);
+				g.fillOval((int) (getX() - viewR), (int) (getY() - viewR), (int)(2 * viewR), (int)(2 * viewR));
 				g.setColor(c);
 			}
 			

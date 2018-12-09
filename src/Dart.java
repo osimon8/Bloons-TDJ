@@ -33,9 +33,14 @@ public class Dart extends TargetedProjectile {
 		Balloon b = intersectingBalloon(hits);
 		
 		if (b != null) {
-			b.damage(getDamage());
-			increaseDistance(25);
-			pops--;
+			if (b.type() != Bloon.LEAD && !b.frozen()) {
+				b.damage(getDamage());
+				increaseDistance(25);
+				pops--;
+			}
+			else {
+				pops = 0;
+			}
 			if (pops <= 0)
 				flagForDeath();
 			else{
