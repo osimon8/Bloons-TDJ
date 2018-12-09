@@ -9,6 +9,7 @@ import java.awt.event.*;
 import java.awt.geom.Area;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -30,8 +31,10 @@ import javax.swing.*;
 public class Field extends JPanel {
 
 	
-	private int lives = 100;
-	private int money = 1000;
+	private int lives = 0;
+	private int money = 0;
+	private int level = 0;
+	private boolean inLevel = false;
 	private List<Projectile> projectiles;
 	private List<Balloon> balloons;
 	private List<Tower> towers;
@@ -43,6 +46,11 @@ public class Field extends JPanel {
 	private JPanel rightHUD;
 	private JFrame frame;
 	private JLabel towerPriceLabel;
+	private JLabel levelLabel = new JLabel ("Level 0/50"); 
+	private JLabel livesLabel = new JLabel (); 
+	private JLabel moneyLabel = new JLabel ();
+	private JButton nextLevel;
+	private Timer bloonGenerator;
 
     public boolean playing = false; // whether the game is running 
     private Image background;
@@ -51,7 +59,6 @@ public class Field extends JPanel {
     // Game constants
     public static int width = 300; //default values 
     public static int height = 300;
-    public static final int SQUARE_VELOCITY = 4;
 
     // Update interval for timer, in milliseconds
     
@@ -73,6 +80,8 @@ public class Field extends JPanel {
         // everything that should be done in a single timestep.
 
         this.frame  = f;
+        changeMoney(50000);
+        changeLives(200);
         background = DataLoader.loadImage("files/Spinny.png");
         width = background.getWidth(null);
         height = background.getHeight(null);
@@ -94,6 +103,16 @@ public class Field extends JPanel {
     	towerPriceLabel.setForeground(Color.YELLOW);
     	towerPriceLabel.setFont(towerPriceLabel.getFont().deriveFont(20F));
     	towerPriceLabel.setVisible(true);
+    	
+    	moneyLabel.setFont(moneyLabel.getFont().deriveFont(30F));
+    	livesLabel.setFont(livesLabel.getFont().deriveFont(30F));
+    	moneyLabel.setForeground(Color.GREEN);
+    	livesLabel.setForeground(Color.RED);
+    	
+    	rightHUD.add(moneyLabel);
+    	rightHUD.add(livesLabel);
+    	
+    	
     	rightHUD.add(towerPriceLabel);
     	
     	bottomHUD.setBackground(new Color(153, 102, 51));
@@ -108,10 +127,26 @@ public class Field extends JPanel {
     	rightHUD.setVisible(true);
     	bottomHUD.setVisible(true);
     	bottomHUD.setOpaque(true);
-
+    	
 
     	
+    	nextLevel = new JButton("Next Level");
+    	nextLevel.setFont(nextLevel.getFont().deriveFont(30F));
+    	levelLabel.setFont(levelLabel.getFont().deriveFont(50F));
+    	nextLevel.addActionListener(new ActionListener() {
+    		@Override
+    		public void actionPerformed(ActionEvent e) {
+    			nextLevel();
+    			inLevel = true;
+    		}    		
+    	});
+    	
+    	bottomHUD.add(levelLabel);
+    	bottomHUD.add(nextLevel);
+    	
     	final JPanel screen = this;
+    	
+
     	
     	JButton newMonkeyButton = new TowerButton(this, new DartMonkey(0, 0, balloons));
     	rightHUD.add(newMonkeyButton);
@@ -205,9 +240,9 @@ public class Field extends JPanel {
     					selectedTower.deselect();
     				}
     				t.select();
-    				Upgrade u = new Upgrade(ResourceManager.getInstance().getImage("stock_bloon"), "Poison", 400, "this is a thing");
-					bottomHUD.removeAll();
-    				bottomHUD.add(u.getComponent());
+//    				Upgrade u = new Upgrade(ResourceManager.getInstance().getImage("stock_bloon"), "Poison", 400, "this is a thing");
+//					bottomHUD.removeAll();
+//    				bottomHUD.add(u.getComponent());
     				frame.validate();
     				//u.getComponent().paintImmediately(u.getComponent().getBounds());
     				selectedTower = t;
@@ -219,7 +254,7 @@ public class Field extends JPanel {
     		if (!found) {
     			if (selectedTower != null) {
     				selectedTower.deselect();
-					bottomHUD.removeAll();
+					//bottomHUD.removeAll();
     			}
     			selectedTower = null;
     		}
@@ -238,22 +273,28 @@ public class Field extends JPanel {
         // Make sure that this component has the keyboard focus
         requestFocusInWindow();
         lastTime = System.currentTimeMillis();
-        Bloon[] bloons = Bloon.values();	
-        Random r = new Random();
         
         
-        Timer timer = new Timer(1000, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            	int n = r.nextInt(bloons.length);
-            	
-        	    Balloon b = new Balloon(bloons[n], bloonPath);
-        	    balloons.add(b);
-        	    b.setPathPosition(0);
-                //System.gc();
-
-            }
-        });
-        timer.start();
+        
+        
+        //Bloon[] bloons = Bloon.values();	
+        //Random r = new Random();
+        
+        //Field screen = this;
+        
+//        Timer timer = new Timer(250, new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//            	//Random Bloon gen
+//            	int n = r.nextInt(bloons.length);
+//            	
+//        	    Balloon b = new Balloon(bloons[n], bloonPath, screen);
+//        	    balloons.add(b);
+//        	    b.setPathPosition(0);
+//                //System.gc();
+//
+//            }
+//        });
+//        timer.start();
         
     }
 
@@ -339,6 +380,21 @@ public class Field extends JPanel {
             lastTime = System.currentTimeMillis();
             //System.out.println(System.currentTimeMillis() - startTime);
             //System.out.println(deltaT);
+            
+            if (inLevel) {
+            	nextLevel.setEnabled(false);
+            }
+            else {
+            	nextLevel.setEnabled(true);
+                if (bloonGenerator != null) {
+                	bloonGenerator.stop();
+                	//bloonGenerator = null;
+                }
+            }
+            
+
+            
+            
         }
     }  
 
@@ -393,11 +449,60 @@ public class Field extends JPanel {
 	public void setTowerPriceLabel(String s) {
 		towerPriceLabel.setText(s);
 	}
+	
+	public void nextLevel() {
+		level++;
+		if (level > 50) {
+			//game win
+		}
+		else {
+			Field screen = this;
+			Collection<Bloon> data;
+			try {
+				data = DataLoader.readLevelData(level);
+	        	Iterator<Bloon> dataI = data.iterator();
+				bloonGenerator = new Timer(250, new ActionListener() {
+		            public void actionPerformed(ActionEvent e) {
+		            	//Random Bloon gen
+		            	
+
+		            	if (inLevel && dataI.hasNext()) {
+		            		Bloon b = dataI.next();
+			        	    Balloon ball = new Balloon(b, bloonPath, screen);
+			        	    balloons.add(ball);
+			        	    ball.setPathPosition(0);
+		            	}
+		
+		            }
+		        });
+				bloonGenerator.start();
+				levelLabel.setText("Level " + level + "/50");
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+		}
+		
+	}
     
     private void removeArea(Tower t) {
     	placementArea.subtract(t.footprint());
     }
     
+    public void changeLives(int delta) {
+    	lives += delta;
+    	livesLabel.setText(lives + " Lives");
+    }
+    
+    public void changeMoney(int delta) {
+    	money += delta;
+    	moneyLabel.setText("$" + money);
+    }
+    
+    public int getMoney() {
+    	return money;
+    }
     
     @Override
     public Dimension getPreferredSize() {

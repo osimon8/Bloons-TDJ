@@ -11,6 +11,9 @@ import javax.swing.JPanel;
 
 public class Upgrade {
 
+	//NOT IMPLEMENTING
+	
+	
 	private BufferedImage icon;
 	private int cost;
 	private String description;

@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -71,6 +72,45 @@ public class DataLoader {
 		r.close();
 		
 		return data;
+		
+	}
+	
+	
+	
+	public static Collection<Bloon> readLevelData(int level) throws IOException{
+		List<Bloon> ret = new LinkedList<>();
+		Reader re = new FileReader("files/data/levelData.dat");
+		@SuppressWarnings("resource") //it thinks I don't close r, but I clearly do
+		BufferedReader r = new BufferedReader(re);
+		int line = 1;
+		String ln = "";
+		
+		while (line != level) {
+			ln = r.readLine().trim();
+			line++;
+		}
+		Scanner sc = new Scanner(ln); 
+		sc.useDelimiter(", ");
+		
+		int bound = 0;
+		
+		String entry = "";
+		
+		while(sc.hasNext()) {
+		
+			entry = sc.next();
+			Scanner sc2 = new Scanner(entry);
+			sc2.useDelimiter(" ");
+			bound = sc2.nextInt();
+			Bloon b = Bloon.valueOf(sc2.next().trim());
+			for (int i = 0; i < bound; i++) {
+				ret.add(b);
+			}
+		
+			sc2.close();
+		}
+		sc.close();
+		return ret;
 		
 	}
 	

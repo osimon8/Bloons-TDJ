@@ -12,7 +12,7 @@ public class Explosion extends Effect {
 	private int damage;
 	
 	public Explosion(double x, double y, int damage, Collection<Balloon> bloons) {
-		super(ResourceManager.getInstance().getImage("explosion_01"), x, y, 2, 100);
+		super(ResourceManager.getInstance().getAnimation("explosion"), x, y, 2, 100);
 		balloons = bloons;
 		this.damage = damage;
 	}
@@ -34,6 +34,7 @@ public class Explosion extends Effect {
 	
 	@Override
 	public Collection<GameObject> update(int time) {
+		super.update(time);
 		List<Balloon> targets = intersectBloon();
 		if (targets != null) {
 			for (Balloon b : targets) {
@@ -46,18 +47,6 @@ public class Explosion extends Effect {
 			hits.addAll(targets);
 		}
 		
-		
-		if (duration <= 0)
-			flagForDeath();
-		// 01, 02, 05, 06
-		else if (duration <= 25)
-			setImage(ResourceManager.getInstance().getImage("explosion_06"));
-		else if (duration <= 50)
-			setImage(ResourceManager.getInstance().getImage("explosion_05"));
-		else if (duration <= 75)
-			setImage(ResourceManager.getInstance().getImage("explosion_02"));
-		
-		duration -= time;
 		return null;
 	}
 	

@@ -33,15 +33,17 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	private boolean refreshImage = false;
 	private int freezeTimer = 0;
 	private Bloon type;
+	private Field field;
 	
 	private List<Bloon> children;
 	private List<Balloon> generatedChildren;
 	
-	public Balloon(Bloon b, Point[] path) {
+	public Balloon(Bloon b, Point[] path, Field f) {
 		super(null);
 		this.path = path;
 		pathPosition = 0;
 		type = b;
+		field = f;
 		setUp();
 		
 		
@@ -51,13 +53,14 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Balloon(Bloon b, Point[] path, int pos) {
+	public Balloon(Bloon b, Point[] path, int pos, Field f) {
 		super(null);
 		this.path = path;
 		pathPosition = pos;
 		type = b;
+		field = f;
 		setUp();
-		
+
 		
 //		if (hp <= 5)
 //			setStockBloon();
@@ -211,7 +214,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 		if (generatedChildren == null) {
 			generatedChildren = new LinkedList<>();
 			for (Bloon b : children) {
-				Balloon ball = new Balloon(b, path, 0);
+				Balloon ball = new Balloon(b, path, 0, field);
 				generatedChildren.add(ball);
 			}
 		}
@@ -298,6 +301,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 			for (GameObject o : getChildren())
 				ret.add(o);
 			flagForDeath();
+			field.changeMoney(1);
 			return ret;
 		}
 			
@@ -350,6 +354,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 				if (pathPosition == path.length - 1) {
 					//decrement life by hp * scale
 					flagForDeath();
+					field.changeLives(-calculateRBE());
 				}
 			}
 		
@@ -357,6 +362,13 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 
 		return null;
 
+	}
+	
+	public int calculateRBE(){
+		int rbe = hp;
+		for (Balloon b : this.getChildren())
+			rbe += b.calculateRBE();
+		return rbe;
 	}
 	
 	public Point getProjectedLocation(int time) {

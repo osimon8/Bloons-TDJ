@@ -17,11 +17,15 @@ public class TowerButton extends JButton {
 		tower = t;
     	this.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            		Tower placingTower = (Tower) tower.clone();
-	            	f.setPlacingTower(placingTower);
-	            	placingTower.visible(false);
-	            	placingTower.select();
-	            	f.requestFocus();
+            		if (f.getMoney() >= tower.getPrice()) {
+                		Tower placingTower = (Tower) tower.clone();
+    	            	f.setPlacingTower(placingTower);
+    	            	placingTower.visible(false);
+    	            	placingTower.select();
+    	            	f.requestFocus();
+    	            	f.changeMoney(-tower.getPrice());
+            		}
+
             }
         });
 		
