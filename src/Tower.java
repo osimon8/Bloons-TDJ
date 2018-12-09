@@ -30,8 +30,6 @@ public abstract class Tower extends GameObject implements Cloneable{
 	private static double baseFireRate = 1;
 	private int price;
 	private String name;
-	private Upgrade.Tier lTier;
-	private Upgrade.Tier rTier;
 	
 	
 	public Tower(BufferedImage img, double x, double y, double vr, double br, double fr, int price, String name, Collection<Balloon> balloons) {
@@ -157,14 +155,6 @@ public abstract class Tower extends GameObject implements Cloneable{
 	}
 	
 	
-	public Upgrade.Tier getLTier(){
-		return lTier;
-	}
-	
-	public Upgrade.Tier getRTier(){
-		return rTier;
-	}
-	
 	public double getCooldown() {
 		return fireCooldown;
 	}
@@ -254,8 +244,5 @@ public abstract class Tower extends GameObject implements Cloneable{
 			}
 		    return null;
 		  }
-
-
-	protected abstract void upgrade(Upgrade.Tier tier);
 
 }
