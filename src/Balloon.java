@@ -372,7 +372,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	}
 	
 	public Point getProjectedLocation(int time) {
-		return path[Math.min(path.length - 1, pathPosition + (int)(20 * time * speed / (Balloon.RED_SPEED * 18)))];
+		return path[Math.min(path.length - 1, pathPosition + (int)(25 * time * speed / (Balloon.RED_SPEED * 18)))];
 	}
 	
 

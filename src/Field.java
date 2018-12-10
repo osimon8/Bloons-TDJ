@@ -46,11 +46,12 @@ public class Field extends JPanel {
 	private JPanel rightHUD;
 	private JFrame frame;
 	private JLabel towerPriceLabel;
-	private JLabel levelLabel = new JLabel ("Level 0/50"); 
-	private JLabel livesLabel = new JLabel (); 
-	private JLabel moneyLabel = new JLabel ();
+	private JLabel levelLabel = new JLabel();
+	private JLabel livesLabel = new JLabel();
+	private JLabel moneyLabel = new JLabel();
 	private JButton nextLevel;
 	private Timer bloonGenerator;
+	private Timer ticker;
 
     public boolean playing = false; // whether the game is running 
     private Image background;
@@ -94,7 +95,17 @@ public class Field extends JPanel {
 			e1.printStackTrace();
 		}
 
+        ticker = new Timer(INTERVAL, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                tick();
+            }
+        });
+    	bottomHUD = new JPanel();
+    	rightHUD = new JPanel();
         
+    	this.setLayout(new BorderLayout());
+    	this.add(rightHUD, BorderLayout.EAST);
+    	this.add(bottomHUD, BorderLayout.SOUTH);
     }
 
     private void place(MouseEvent e) {
@@ -139,14 +150,28 @@ public class Field extends JPanel {
      * (Re-)set the game to its initial state.
      */
     public void reset() {
+    	ticker.stop();
+    	moneyLabel = new JLabel();
+    	livesLabel = new JLabel();
 
-
+    	lives = 0;
+    	money = 0;
+    	inLevel = false;
+    	
         changeMoney(500);
         changeLives(200);
-
+        level = 0;
+    	levelLabel = new JLabel();
+        levelLabel.setText("Level " + level + " /50");
     	
     	bottomHUD = new JPanel();
     	rightHUD = new JPanel();
+        
+    	this.removeAll();
+    	
+    	this.setLayout(new BorderLayout());
+    	this.add(rightHUD, BorderLayout.EAST);
+    	this.add(bottomHUD, BorderLayout.SOUTH);
 
     	
         projectiles = new LinkedList<>();
@@ -163,6 +188,9 @@ public class Field extends JPanel {
     	towerPriceLabel.setFont(towerPriceLabel.getFont().deriveFont(15F));
     	towerPriceLabel.setVisible(true);
     	//towerPriceLabel.se
+    	
+
+
     	
     	moneyLabel.setFont(moneyLabel.getFont().deriveFont(30F));
     	livesLabel.setFont(livesLabel.getFont().deriveFont(30F));
@@ -181,9 +209,6 @@ public class Field extends JPanel {
     	rightHUD.setBackground(new Color(153, 102, 51));
     	rightHUD.setPreferredSize(new Dimension(200, height));
     	rightHUD.setLayout(new BoxLayout(rightHUD, BoxLayout.Y_AXIS));
-    	this.setLayout(new BorderLayout());
-    	this.add(rightHUD, BorderLayout.EAST);
-    	this.add(bottomHUD, BorderLayout.SOUTH);
     	rightHUD.setVisible(true);
     	bottomHUD.setVisible(true);
     	bottomHUD.setOpaque(true);
@@ -220,6 +245,8 @@ public class Field extends JPanel {
     	JButton newIceButton = new TowerButton(this, new IceTower(0, 0, balloons));
     	rightHUD.add(newIceButton);
     	
+    	JButton newSuperMonkeyButton = new TowerButton(this, new SuperMonkey(0, 0, balloons));
+    	rightHUD.add(newSuperMonkeyButton);
     	
     	JButton newSpikeButton = new TowerButton(this, new Spikes(0, 0, balloons));
     	rightHUD.add(newSpikeButton);
@@ -264,12 +291,7 @@ public class Field extends JPanel {
             	}
             });
     	
-        Timer timer = new Timer(INTERVAL, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tick();
-            }
-        });
-        timer.start(); // MAKE SURE TO START THE TIMER!
+
 
 
         setFocusable(true);
@@ -279,6 +301,7 @@ public class Field extends JPanel {
         
 
         playing = true;
+        inLevel = false;
         requestFocusInWindow();
         lastTime = System.currentTimeMillis();
         
@@ -303,105 +326,123 @@ public class Field extends JPanel {
 //            }
 //        });
 //        timer.start();
+     
         
+        ticker.start();
+        frame.validate();
     }
 
     /**
      * This method is called every time the timer defined in the constructor triggers.
      */
     void tick() {
-        if (playing) {
-	
-        	List<GameObject> deaths = new LinkedList<>();
-        	List<GameObject> temp = new LinkedList<>();
-        	
-        	int deltaT = (int)(System.currentTimeMillis() - lastTime);
-        	//System.out.println(deltaT);
-        	for (GameObject t : towers) {
-        		//o.update(INTERVAL);
-        		Collection<GameObject> newStuff = t.update(deltaT);
-        		if (newStuff != null)
-        			temp.addAll(newStuff);
-        		//System.out.println(balloons);
-        		if (!t.alive()) {
-        			deaths.add(t);
-        		}
-        	}
-        	
-        	addNewGameObjects(temp);
-        	
-        	for (GameObject o : projectiles) {
-        		//o.update(INTERVAL);
-        		Collection<GameObject> newStuff = o.update(deltaT);
-        		if (newStuff != null)
-        			temp.addAll(newStuff);
-        		//System.out.println(balloons);
-        		if (!o.alive()) {
-        			deaths.add(o);
-        		}
-        	}
-        	
-        	addNewGameObjects(temp);
-        	
-        	for (GameObject b : balloons) {
-        		//o.update(INTERVAL);
-        		Collection<GameObject> newStuff = b.update(deltaT);
-        		if (newStuff != null)
-        			temp.addAll(newStuff);
-        		if (!b.alive()) {
-        			deaths.add(b);
-        		}
-        	}
-        	
-        	addNewGameObjects(temp);
-        	
-        	for (GameObject o : effects) {
-        		//o.update(INTERVAL);
-        		Collection<GameObject> newStuff = o.update(deltaT);
-        		if (newStuff != null)
-        			temp.addAll(newStuff);
-        		//System.out.println(balloons);
-        		if (!o.alive()) {
-        			deaths.add(o);
-        		}
-        	}
-        	
-        	addNewGameObjects(temp);
-            
-            for (GameObject o : deaths) {
-            	if (o instanceof Projectile)
-            		projectiles.remove(o);
-            	else if (o instanceof Balloon) 
-            		balloons.remove(o);
-            	else if (o instanceof Tower) 
-            		towers.remove(o);
-            	else if (o instanceof Effect) 
-            		effects.remove(o);
-            }
-            
 
-            repaint();
-            lastTime = System.currentTimeMillis();
-            
-            if (lives <= 0) {
-            	playing = false;
-            	levelLabel.setText("YOU LOSE");
-            	nextLevel.setText("Replay");
-            }
-            
-            nextLevel.setEnabled(!inLevel);
-            
-            if (inLevel && !bloonGenerator.isRunning() && balloons.isEmpty()) {
-            	inLevel = false;
-            	changeMoney(99 + level);
-            	for (Tower t : towers) {
-            		if (t instanceof Spikes)
-            			t.flagForDeath();
-            	}
-            }
-            
-            
+    	List<GameObject> deaths = new LinkedList<>();
+    	List<GameObject> temp = new LinkedList<>();
+    	
+    	int deltaT = (int)(System.currentTimeMillis() - lastTime);
+    	//System.out.println(deltaT);
+    	for (GameObject t : towers) {
+    		//o.update(INTERVAL);
+    		if (playing) {
+	    		Collection<GameObject> newStuff = t.update(deltaT);
+	    		if (newStuff != null)
+	    			temp.addAll(newStuff);
+    		}
+    		//System.out.println(balloons);
+    		if (!t.alive()) {
+    			deaths.add(t);
+    		}
+    	}
+    	
+    	addNewGameObjects(temp);
+    	
+    	for (GameObject o : projectiles) {
+    		//o.update(INTERVAL);
+    		Collection<GameObject> newStuff = o.update(deltaT);
+    		if (newStuff != null)
+    			temp.addAll(newStuff);
+    		//System.out.println(balloons);
+    		if (!o.alive()) {
+    			deaths.add(o);
+    		}
+    	}
+    	
+    	addNewGameObjects(temp);
+    	
+    	for (GameObject b : balloons) {
+    		//o.update(INTERVAL);
+    		Collection<GameObject> newStuff = b.update(deltaT);
+    		if (newStuff != null)
+    			temp.addAll(newStuff);
+    		if (!b.alive()) {
+    			deaths.add(b);
+    		}
+    	}
+    	
+    	addNewGameObjects(temp);
+    	
+    	for (GameObject o : effects) {
+    		//o.update(INTERVAL);
+    		Collection<GameObject> newStuff = o.update(deltaT);
+    		if (newStuff != null)
+    			temp.addAll(newStuff);
+    		//System.out.println(balloons);
+    		if (!o.alive()) {
+    			deaths.add(o);
+    		}
+    	}
+    	
+    	addNewGameObjects(temp);
+        
+        for (GameObject o : deaths) {
+        	if (o instanceof Projectile)
+        		projectiles.remove(o);
+        	else if (o instanceof Balloon) 
+        		balloons.remove(o);
+        	else if (o instanceof Tower) 
+        		towers.remove(o);
+        	else if (o instanceof Effect) 
+        		effects.remove(o);
         }
+        
+
+        repaint();
+        lastTime = System.currentTimeMillis();
+        
+        if (lives < 0) {
+        	lives = 0;
+        	changeLives(0);
+        }
+        if (lives == 0) {
+        	playing = false;
+        	inLevel = false;
+        	levelLabel.setText("YOU LOSE");
+        	nextLevel.setText("Replay");
+        	bottomHUD = null;
+        }
+        
+        nextLevel.setEnabled(!inLevel);
+        
+        if (inLevel && !bloonGenerator.isRunning() && balloons.isEmpty()) {
+        	inLevel = false;
+        	changeMoney(99 + level);
+        	for (Tower t : towers) {
+        		if (t instanceof Spikes)
+        			t.flagForDeath();
+        	}
+        	
+        	if (level == 50) {
+            	playing = false;
+            	inLevel = false;
+        		levelLabel.setText("YOU WIN!!");
+            	nextLevel.setText("Replay");
+            	bottomHUD = null;
+        	}
+        }
+        
+            
+        
     }  
 
     
@@ -442,7 +483,8 @@ public class Field extends JPanel {
     	if (placingTower != null)
     		placingTower.draw(g);
     	
-    	bottomHUD.repaint();
+//    	bottomHUD.repaint();
+//    	rightHUD.repaint();
 //    	if (bottomHUD != null && bottomHUD.getComponentCount() > 0)
 //    		bottomHUD.getComponent(0).repaint();
     	//rightHUD.paintAll(g);    	
@@ -459,7 +501,7 @@ public class Field extends JPanel {
 	public void nextLevel() {
 		level++;
 		if (level > 50) {
-			levelLabel.setText("YOU WIN!!");
+			//this shouldn't happen
 		}
 		else {
 			Field screen = this;

@@ -137,20 +137,20 @@ public abstract class Tower extends GameObject implements Cloneable{
 
 	
 	protected Balloon selectTarget(List<Balloon> bs) {
-		Collections.sort(bs);
-		switch(mode){
-		default:
-		case FIRST:
-			return bs.get(0);
-		case LAST:
-			return bs.get(bs.size() - 1);
-		case STRONG:
-			return Collections.max(bs);
-		case WEAK:
-			return Collections.min(bs);
-			
-		}
-		
+//		Collections.sort(bs);
+//		switch(mode){
+//		default:
+//		case FIRST:
+//			return bs.get(0);
+//		case LAST:
+//			return bs.get(bs.size() - 1);
+//		case STRONG:
+//			return Collections.max(bs);
+//		case WEAK:
+//			return Collections.min(bs);
+//			
+//		
+		return bs.get(0);
 		
 	}
 	

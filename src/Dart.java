@@ -16,6 +16,11 @@ public class Dart extends TargetedProjectile {
         this.scale(1.1);
 	}
 	
+	public Dart(double x, double y, double targetX, double targetY, double extra, Collection<Balloon> b) {
+		super(ResourceManager.getInstance().getImage("dart_monkey_dart"), x, y, speed, targetX, targetY, b, extra);
+        this.scale(1.1);
+	}
+	
 	@Override 
 	public Polygon getHitBox() {
 		if (USE_PRECISE_HITBOX) {
