@@ -401,8 +401,10 @@ public class Field extends JPanel {
         		projectiles.remove(o);
         	else if (o instanceof Balloon) 
         		balloons.remove(o);
-        	else if (o instanceof Tower) 
+        	else if (o instanceof Tower) { 
+        		addArea((Tower)o);
         		towers.remove(o);
+        	}
         	else if (o instanceof Effect) 
         		effects.remove(o);
         }
@@ -540,6 +542,10 @@ public class Field extends JPanel {
     
     private void removeArea(Tower t) {
     	placementArea.subtract(t.footprint());
+    }
+    
+    private void addArea(Tower t) {
+    	placementArea.add(t.footprint());
     }
     
     public void changeLives(int delta) {
