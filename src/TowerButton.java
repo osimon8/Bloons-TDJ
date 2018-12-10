@@ -19,8 +19,10 @@ public class TowerButton extends JButton {
 		tower = t;
     	this.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	//!t.equals(f.getPlacing()) &&
-            		if ( f.playing() && f.getMoney() >= tower.getPrice()) {
+            		if (f.getPlacing() != null && t.getClass().equals(f.getPlacing().getClass()))
+            			f.setPlacingTower(null);
+            	
+            		else if ( f.playing() && f.getMoney() >= tower.getPrice()) {
                 		Tower placingTower = (Tower) tower.clone();
     	            	f.setPlacingTower(placingTower);
     	            	placingTower.visible(false);
