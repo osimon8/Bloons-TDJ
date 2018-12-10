@@ -46,10 +46,11 @@ public class Field extends JPanel {
 	private JPanel rightHUD;
 	private JFrame frame;
 	private JLabel towerPriceLabel;
-	private JLabel levelLabel = new JLabel();
-	private JLabel livesLabel = new JLabel();
-	private JLabel moneyLabel = new JLabel();
+	private JLabel levelLabel;
+	private JLabel livesLabel;
+	private JLabel moneyLabel;
 	private JButton nextLevel;
+	private JButton sellButton;
 	private Timer bloonGenerator;
 	private Timer ticker;
 
@@ -254,6 +255,17 @@ public class Field extends JPanel {
     	JButton newPineappleButton = new TowerButton(this, new Pineapple(0, 0, balloons));
     	rightHUD.add(newPineappleButton);
     	
+    	
+    	sellButton = new JButton("Sell");
+    	sellButton.setFont(sellButton.getFont().deriveFont(15F));
+    	sellButton.addActionListener(e -> {
+    		selectedTower.flagForDeath();
+    		changeMoney((int)(selectedTower.getPrice() * 0.75));
+    		selectedTower = null;
+    	});
+    	
+    	rightHUD.add(sellButton);
+    	
 		this.addMouseMotionListener(new MouseAdapter() {
 			@Override
             public void mouseMoved(MouseEvent e) {
@@ -423,6 +435,14 @@ public class Field extends JPanel {
         }
         
         nextLevel.setEnabled(!inLevel);
+        
+        if(selectedTower != null && !(selectedTower instanceof Spikes) && !(selectedTower instanceof Pineapple)) {
+        	sellButton.setVisible(true);
+        	sellButton.setText("Sell: $" + (int)(0.75 * selectedTower.getPrice()));
+        }
+        else {
+        	sellButton.setVisible(false);
+        }
         
         if (inLevel && !bloonGenerator.isRunning() && balloons.isEmpty()) {
         	inLevel = false;
