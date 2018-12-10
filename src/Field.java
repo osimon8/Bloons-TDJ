@@ -80,11 +80,70 @@ public class Field extends JPanel {
         // everything that should be done in a single timestep.
 
         this.frame  = f;
-        changeMoney(50000);
-        changeLives(200);
+        this.money = 0;
+        this.lives = 0;
+        
         background = DataLoader.loadImage("files/Spinny.png");
         width = background.getWidth(null);
         height = background.getHeight(null);
+        
+        try {
+			bloonPath = DataLoader.readPathData("spinny");
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+        
+    }
+
+    private void place(MouseEvent e) {
+    	if (placingTower != null && placingTower.valid()) {
+    		towers.add(placingTower);
+        	removeArea(placingTower);
+        	if (selectedTower != null)
+        		selectedTower.deselect();
+        	selectedTower = placingTower;
+    		placingTower = null;
+    	}
+    	else {
+    		boolean found = false;
+    		for (Tower t : towers) {
+    			if (t.getBounds().contains(e.getPoint())) {
+    				if (selectedTower != null) {
+    					selectedTower.deselect();
+    				}
+    				t.select();
+//    				Upgrade u = new Upgrade(ResourceManager.getInstance().getImage("stock_bloon"), "Poison", 400, "this is a thing");
+//					bottomHUD.removeAll();
+//    				bottomHUD.add(u.getComponent());
+    				frame.validate();
+    				//u.getComponent().paintImmediately(u.getComponent().getBounds());
+    				selectedTower = t;
+    				found = true;
+    				break;
+    			}
+    			
+    		}
+    		if (!found) {
+    			if (selectedTower != null) {
+    				selectedTower.deselect();
+					//bottomHUD.removeAll();
+    			}
+    			selectedTower = null;
+    		}
+    	}
+    }
+    
+    /**
+     * (Re-)set the game to its initial state.
+     */
+    public void reset() {
+
+
+        changeMoney(500);
+        changeLives(200);
+
     	
     	bottomHUD = new JPanel();
     	rightHUD = new JPanel();
@@ -101,8 +160,9 @@ public class Field extends JPanel {
     	towerPriceLabel = new JLabel();
     	//price.setOpaque(false);
     	towerPriceLabel.setForeground(Color.YELLOW);
-    	towerPriceLabel.setFont(towerPriceLabel.getFont().deriveFont(20F));
+    	towerPriceLabel.setFont(towerPriceLabel.getFont().deriveFont(15F));
     	towerPriceLabel.setVisible(true);
+    	//towerPriceLabel.se
     	
     	moneyLabel.setFont(moneyLabel.getFont().deriveFont(30F));
     	livesLabel.setFont(livesLabel.getFont().deriveFont(30F));
@@ -136,15 +196,15 @@ public class Field extends JPanel {
     	nextLevel.addActionListener(new ActionListener() {
     		@Override
     		public void actionPerformed(ActionEvent e) {
-    			nextLevel();
-    			inLevel = true;
+    			if (playing())
+    				nextLevel();
+    			else
+    				reset();
     		}    		
     	});
     	
     	bottomHUD.add(levelLabel);
     	bottomHUD.add(nextLevel);
-    	
-    	final JPanel screen = this;
     	
 
     	
@@ -159,6 +219,13 @@ public class Field extends JPanel {
     	
     	JButton newIceButton = new TowerButton(this, new IceTower(0, 0, balloons));
     	rightHUD.add(newIceButton);
+    	
+    	
+    	JButton newSpikeButton = new TowerButton(this, new Spikes(0, 0, balloons));
+    	rightHUD.add(newSpikeButton);
+    	
+    	JButton newPineappleButton = new TowerButton(this, new Pineapple(0, 0, balloons));
+    	rightHUD.add(newPineappleButton);
     	
 		this.addMouseMotionListener(new MouseAdapter() {
 			@Override
@@ -210,67 +277,8 @@ public class Field extends JPanel {
         
         placementArea = new Area(new Rectangle(0, 0, width, height));
         
-        
-        try {
-			bloonPath = DataLoader.readPathData("spinny");
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-        
 
-
-        
-    }
-
-    private void place(MouseEvent e) {
-    	if (placingTower != null && placingTower.valid()) {
-    		towers.add(placingTower);
-        	removeArea(placingTower);
-        	if (selectedTower != null)
-        		selectedTower.deselect();
-        	selectedTower = placingTower;
-    		placingTower = null;
-    	}
-    	else {
-    		boolean found = false;
-    		for (Tower t : towers) {
-    			if (t.getBounds().contains(e.getPoint())) {
-    				if (selectedTower != null) {
-    					selectedTower.deselect();
-    				}
-    				t.select();
-//    				Upgrade u = new Upgrade(ResourceManager.getInstance().getImage("stock_bloon"), "Poison", 400, "this is a thing");
-//					bottomHUD.removeAll();
-//    				bottomHUD.add(u.getComponent());
-    				frame.validate();
-    				//u.getComponent().paintImmediately(u.getComponent().getBounds());
-    				selectedTower = t;
-    				found = true;
-    				break;
-    			}
-    			
-    		}
-    		if (!found) {
-    			if (selectedTower != null) {
-    				selectedTower.deselect();
-					//bottomHUD.removeAll();
-    			}
-    			selectedTower = null;
-    		}
-    	}
-    }
-    
-    /**
-     * (Re-)set the game to its initial state.
-     */
-    public void reset() {
-
-    	
         playing = true;
-        //status.setText("Running...");
-
-        // Make sure that this component has the keyboard focus
         requestFocusInWindow();
         lastTime = System.currentTimeMillis();
         
@@ -372,27 +380,25 @@ public class Field extends JPanel {
             }
             
 
-            // update the display
-            //paintImmediately(getBounds());
             repaint();
-            //elapsedTime += deltaT;
-            //numLoops++;
             lastTime = System.currentTimeMillis();
-            //System.out.println(System.currentTimeMillis() - startTime);
-            //System.out.println(deltaT);
             
-            if (inLevel) {
-            	nextLevel.setEnabled(false);
-            }
-            else {
-            	nextLevel.setEnabled(true);
-                if (bloonGenerator != null) {
-                	bloonGenerator.stop();
-                	//bloonGenerator = null;
-                }
+            if (lives <= 0) {
+            	playing = false;
+            	levelLabel.setText("YOU LOSE");
+            	nextLevel.setText("Replay");
             }
             
-
+            nextLevel.setEnabled(!inLevel);
+            
+            if (inLevel && !bloonGenerator.isRunning() && balloons.isEmpty()) {
+            	inLevel = false;
+            	changeMoney(99 + level);
+            	for (Tower t : towers) {
+            		if (t instanceof Spikes)
+            			t.flagForDeath();
+            	}
+            }
             
             
         }
@@ -446,14 +452,14 @@ public class Field extends JPanel {
 		placingTower = t;
 	}
 	
-	public void setTowerPriceLabel(String s) {
-		towerPriceLabel.setText(s);
+	public JLabel getTowerPriceLabel() {
+		return towerPriceLabel;
 	}
 	
 	public void nextLevel() {
 		level++;
 		if (level > 50) {
-			//game win
+			levelLabel.setText("YOU WIN!!");
 		}
 		else {
 			Field screen = this;
@@ -463,22 +469,22 @@ public class Field extends JPanel {
 	        	Iterator<Bloon> dataI = data.iterator();
 				bloonGenerator = new Timer(250, new ActionListener() {
 		            public void actionPerformed(ActionEvent e) {
-		            	//Random Bloon gen
-		            	
-
 		            	if (inLevel && dataI.hasNext()) {
 		            		Bloon b = dataI.next();
 			        	    Balloon ball = new Balloon(b, bloonPath, screen);
 			        	    balloons.add(ball);
 			        	    ball.setPathPosition(0);
 		            	}
+		            	else {
+		            		bloonGenerator.stop();
+		            	}
 		
 		            }
 		        });
 				bloonGenerator.start();
+				inLevel = true;
 				levelLabel.setText("Level " + level + "/50");
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
@@ -502,6 +508,10 @@ public class Field extends JPanel {
     
     public int getMoney() {
     	return money;
+    }
+    
+    public boolean playing() {
+    	return playing;
     }
     
     @Override

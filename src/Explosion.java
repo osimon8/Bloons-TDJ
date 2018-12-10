@@ -24,7 +24,7 @@ public class Explosion extends Effect {
 		for (Balloon b : balloons) {
 			if (!hits.contains(b)) {
 				Area a = new Area(b.getBounds());
-				a.intersect(new Area(new Ellipse2D.Double(getX() - r / 2, getY() - r / 2, r, r)));
+				a.intersect(new Area(new Ellipse2D.Double(getX() - r, getY() - r, 2 * r, 2 * r)));
 				if (!a.isEmpty())
 					l.add(b);
 			}

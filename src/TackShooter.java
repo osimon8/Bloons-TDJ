@@ -12,7 +12,7 @@ public class TackShooter extends Tower {
 	private static double viewRad = 100;
 	
 	public TackShooter(double x, double y, Collection<Balloon> balloons) {
-		super(null, x, y, DataLoader.SCALE * viewRad, 0, 0.6, 300, "Tack Shooter", balloons);
+		super(null, x, y, DataLoader.SCALE * viewRad, 0, 0.6, 305, "Tack Shooter", balloons);
 		setAnimation(generateImages(), 100);
 		// TODO Auto-generated constructor stub
 	}

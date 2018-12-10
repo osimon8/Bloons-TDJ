@@ -24,18 +24,18 @@ public class Game implements Runnable {
         // Top-level frame in which game components live
         // Be sure to change "TOP LEVEL FRAME" to the name of your game
         final JFrame frame = new JFrame("Bloons TDJ");
-        //frame.setResizable(false);
+        frame.setResizable(false);
         frame.setLocation(800, 350);
         
         JPanel screen = new JPanel();
         
         JPanel main_menu = new JPanel();
-        main_menu.setPreferredSize(new Dimension(300, 300));
+        main_menu.setPreferredSize(new Dimension(500, 500));
         
         
         
         JPanel instructions = new JPanel();
-        instructions.setPreferredSize(new Dimension(300, 300));
+        instructions.setPreferredSize(new Dimension(500, 500));
 
         Field in_game = new Field(frame);
         //in_game.setPreferredSize(new Dimension(800, 800));

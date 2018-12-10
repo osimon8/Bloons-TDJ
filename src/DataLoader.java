@@ -82,7 +82,7 @@ public class DataLoader {
 		Reader re = new FileReader("files/data/levelData.dat");
 		@SuppressWarnings("resource") //it thinks I don't close r, but I clearly do
 		BufferedReader r = new BufferedReader(re);
-		int line = 1;
+		int line = 0;
 		String ln = "";
 		
 		while (line != level) {

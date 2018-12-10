@@ -26,7 +26,7 @@ public abstract class Tower extends GameObject implements Cloneable{
 	private TargetMode mode;
 	private boolean selected = false;
 	private boolean valid = true;
-	private Area footprint;
+	protected Area footprint;
 	private static double baseFireRate = 1;
 	private int price;
 	private String name;
@@ -76,7 +76,7 @@ public abstract class Tower extends GameObject implements Cloneable{
 		FOV.subtract(new Area(new Ellipse2D.Double(x - getBlindRadius(), y - getBlindRadius(), 2 * getBlindRadius(), 2 * getBlindRadius())));
 	}
 	
-	private void setFootprint() {
+	protected void setFootprint() {
 		int r = 3 * Math.min(getWidth(), getHeight()) / 4;
 		footprint = new Area(new Ellipse2D.Double(getX() - r / 2, getY() - r / 2, r, r));
 	}
@@ -123,7 +123,7 @@ public abstract class Tower extends GameObject implements Cloneable{
 		List<Balloon> l = new LinkedList<>();
 		
 		for (Balloon b : balloons) {
-			if (true || !(Point.distance(getX(), getY(), b.getX(), b.getY()) > viewR + Math.max(b.getHeight(), b.getWidth()))) {
+			if (b.alive() || !(Point.distance(getX(), getY(), b.getX(), b.getY()) > viewR + Math.max(b.getHeight(), b.getWidth()))) {
 				Area a = new Area(b.getBounds());
 				a.intersect(FOV);
 				if (!a.isEmpty())

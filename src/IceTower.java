@@ -14,7 +14,7 @@ public class IceTower extends Tower {
 	public static int duration = 500;
 	
 	public IceTower(double x, double y, Collection<Balloon> balloons) {
-		super(generateImage(1), x, y, DataLoader.SCALE * viewRad, 0, 0.5, 450, "Ice Tower", balloons);
+		super(generateImage(1), x, y, DataLoader.SCALE * viewRad, 0, 0.5, 255, "Ice Tower", balloons);
 	}
 	
 

@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -7,6 +8,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 
 public class TowerButton extends JButton {
 
@@ -17,7 +19,7 @@ public class TowerButton extends JButton {
 		tower = t;
     	this.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            		if (f.getMoney() >= tower.getPrice()) {
+            		if (f.playing() && f.getMoney() >= tower.getPrice()) {
                 		Tower placingTower = (Tower) tower.clone();
     	            	f.setPlacingTower(placingTower);
     	            	placingTower.visible(false);
@@ -33,28 +35,18 @@ public class TowerButton extends JButton {
     		
     		@Override
     		public void mouseMoved(MouseEvent e) {
-    			f.setTowerPriceLabel(t.getName() + ": $" + tower.getPrice());
+    			JLabel lab = f.getTowerPriceLabel();
+    			if (f.getMoney() >= tower.getPrice())
+    				lab.setForeground(Color.YELLOW);
+    			else 
+    				lab.setForeground(new Color(255, 102, 102));
+    			lab.setText(t.getName() + ": $" + tower.getPrice());
     		}
     		
     	});
     
     	this.setOpaque(false);
         this.setContentAreaFilled(false);
-        //this.setBorderPainted(false);
 	}
-	
-	
-//	@Override
-//	protected void paintComponent(Graphics g) {
-//		g.drawImage(tower.getImage(), 0, 0, null);
-//		
-//		
-//	}
-//	
-//	@Override
-//	public Dimension getPreferredSize() {
-//		return new Dimension(tower.getImage().getWidth(), tower.getImage().getHeight());
-//	}
-//	
 	
 }
