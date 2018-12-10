@@ -155,6 +155,49 @@ public abstract class Tower extends GameObject implements Cloneable{
 	}
 	
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((FOV == null) ? 0 : FOV.hashCode());
+		result = prime * result + ((balloons == null) ? 0 : balloons.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(blindR);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(fireCooldown);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(fireRate);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((footprint == null) ? 0 : footprint.hashCode());
+		result = prime * result + ((mode == null) ? 0 : mode.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + price;
+		result = prime * result + (selected ? 1231 : 1237);
+		result = prime * result + (valid ? 1231 : 1237);
+		temp = Double.doubleToLongBits(viewR);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Tower other = (Tower) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
+
+
 	public double getCooldown() {
 		return fireCooldown;
 	}

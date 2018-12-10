@@ -39,7 +39,6 @@ public class Field extends JPanel {
 	private List<Balloon> balloons;
 	private List<Tower> towers;
 	private List<Effect> effects;
-	private ResourceManager res;
 	private Point[] bloonPath;
 	private Area placementArea;
 	private JPanel bottomHUD;
@@ -115,6 +114,7 @@ public class Field extends JPanel {
         	if (selectedTower != null)
         		selectedTower.deselect();
         	selectedTower = placingTower;
+        	changeMoney(-placingTower.getPrice());
     		placingTower = null;
     	}
     	else {
@@ -125,11 +125,7 @@ public class Field extends JPanel {
     					selectedTower.deselect();
     				}
     				t.select();
-//    				Upgrade u = new Upgrade(ResourceManager.getInstance().getImage("stock_bloon"), "Poison", 400, "this is a thing");
-//					bottomHUD.removeAll();
-//    				bottomHUD.add(u.getComponent());
     				frame.validate();
-    				//u.getComponent().paintImmediately(u.getComponent().getBounds());
     				selectedTower = t;
     				found = true;
     				break;
@@ -178,18 +174,12 @@ public class Field extends JPanel {
         effects = new LinkedList<>();
         towers = new LinkedList<>();
         balloons = new LinkedList<>();
-        
-
-        res = ResourceManager.getInstance();
+ 
         
     	towerPriceLabel = new JLabel();
-    	//price.setOpaque(false);
     	towerPriceLabel.setForeground(Color.YELLOW);
     	towerPriceLabel.setFont(towerPriceLabel.getFont().deriveFont(15F));
     	towerPriceLabel.setVisible(true);
-    	//towerPriceLabel.se
-    	
-
 
     	
     	moneyLabel.setFont(moneyLabel.getFont().deriveFont(30F));
@@ -204,7 +194,6 @@ public class Field extends JPanel {
     	rightHUD.add(towerPriceLabel);
     	
     	bottomHUD.setBackground(new Color(153, 102, 51));
-    	//bottomHUD.setLayout(null);
     	bottomHUD.setPreferredSize(new Dimension(width, 100));
     	rightHUD.setBackground(new Color(153, 102, 51));
     	rightHUD.setPreferredSize(new Dimension(200, height));
@@ -482,12 +471,7 @@ public class Field extends JPanel {
     	
     	if (placingTower != null)
     		placingTower.draw(g);
-    	
-//    	bottomHUD.repaint();
-//    	rightHUD.repaint();
-//    	if (bottomHUD != null && bottomHUD.getComponentCount() > 0)
-//    		bottomHUD.getComponent(0).repaint();
-    	//rightHUD.paintAll(g);    	
+    		
 	}
     
 	public void setPlacingTower(Tower t) {
@@ -554,6 +538,14 @@ public class Field extends JPanel {
     
     public boolean playing() {
     	return playing;
+    }
+    
+    public Tower getSelected() {
+    	return selectedTower;
+    }
+    
+    public Tower getPlacing() {
+    	return placingTower;
     }
     
     @Override
