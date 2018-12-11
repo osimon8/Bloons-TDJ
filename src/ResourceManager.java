@@ -29,18 +29,17 @@ public class ResourceManager {
 			animations = (Map<String, List<String>>) data[1];
 			inGame = DataLoader.loadImage("files/InGame.png");
 		} catch (IOException | XMLStreamException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		
-		// TODO Auto-generated constructor stub
 	}
 	
 	
     static {
         instance = new ResourceManager();
     }
+    //This instantiates it once as the program starts, I looked up the best way to do this
+    //since I only really want this instantiated once, it's called the Singleton design pattern.
     
     public static ResourceManager getInstance() {
     	return instance;
@@ -137,6 +136,7 @@ public class ResourceManager {
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics gc = copy.createGraphics();
 		gc.drawImage(img, 0, 0, null);
+		//I found the simplest way to do this on StackOverflow
 		return copy;
 	}
 	
@@ -151,7 +151,8 @@ public class ResourceManager {
 		g.drawImage(original, 0, 0, newWidth, newHeight, 0, 0, original.getWidth(),
 		    original.getHeight(), null);
 		g.dispose();
-
+		//I found the simplest way to do this on StackOverflow
+		
 		return resized;
 		
 	}
