@@ -32,7 +32,8 @@ public abstract class Tower extends GameObject implements Cloneable{
 	private String name;
 	
 	
-	public Tower(BufferedImage img, double x, double y, double vr, double br, double fr, int price, String name, Collection<Balloon> balloons) {
+	public Tower(BufferedImage img, double x, double y, double vr, double br, double fr, int price,
+			String name, Collection<Balloon> balloons) {
 		super(img, x, y);
 		this.balloons = balloons;
 		viewR = vr;
@@ -44,13 +45,8 @@ public abstract class Tower extends GameObject implements Cloneable{
 		mode = TargetMode.FIRST;
 		this.price = price;
 		this.name = name;
-		// TODO Auto-generated constructor stub
 	}
 
-	
-//	public static Tower makeBombTower(double x, double y, Collection<Balloon> balloons) {
-//		return new Tower(ResourceManager.getInstance().getImage("bomb_tower_01"), x, y, 350, 0, 0.66, balloons);
-//	}
 	
 	public Collection<Balloon> getBalloons(){
 		return balloons;
@@ -72,8 +68,10 @@ public abstract class Tower extends GameObject implements Cloneable{
 	protected void setFOV() {
 		double x = getX();
 		double y = getY();
-		FOV = new Area(new Ellipse2D.Double(x - getViewRadius(), y - getViewRadius(), 2 * getViewRadius(), 2 * getViewRadius()));
-		FOV.subtract(new Area(new Ellipse2D.Double(x - getBlindRadius(), y - getBlindRadius(), 2 * getBlindRadius(), 2 * getBlindRadius())));
+		FOV = new Area(new Ellipse2D.Double(x - getViewRadius(), y - getViewRadius(),
+				2 * getViewRadius(), 2 * getViewRadius()));
+		FOV.subtract(new Area(new Ellipse2D.Double(x - getBlindRadius(), y - getBlindRadius(),
+				2 * getBlindRadius(), 2 * getBlindRadius())));
 	}
 	
 	protected void setFootprint() {
@@ -119,11 +117,11 @@ public abstract class Tower extends GameObject implements Cloneable{
 	}
 	
 	protected List<Balloon> intersectBloon() {
-		//long t = System.nanoTime();
 		List<Balloon> l = new LinkedList<>();
 		
 		for (Balloon b : balloons) {
-			if (b.alive() || !(Point.distance(getX(), getY(), b.getX(), b.getY()) > viewR + Math.max(b.getHeight(), b.getWidth()))) {
+			if (b.alive() || !(Point.distance(getX(), getY(), b.getX(), b.getY()) > 
+			viewR + Math.max(b.getHeight(), b.getWidth()))) {
 				Area a = new Area(b.getBounds());
 				a.intersect(FOV);
 				if (!a.isEmpty())
@@ -131,7 +129,6 @@ public abstract class Tower extends GameObject implements Cloneable{
 			}
 
 		}
-		//System.out.println((System.nanoTime() - t) / 1000000000.0);
 		return l;
 	}
 
@@ -148,55 +145,15 @@ public abstract class Tower extends GameObject implements Cloneable{
 //			return Collections.max(bs);
 //		case WEAK:
 //			return Collections.min(bs);
-//			
+//		Decided not implement this	
 //		
 		return bs.get(0);
 		
 	}
 	
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((FOV == null) ? 0 : FOV.hashCode());
-		result = prime * result + ((balloons == null) ? 0 : balloons.hashCode());
-		long temp;
-		temp = Double.doubleToLongBits(blindR);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(fireCooldown);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(fireRate);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((footprint == null) ? 0 : footprint.hashCode());
-		result = prime * result + ((mode == null) ? 0 : mode.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + price;
-		result = prime * result + (selected ? 1231 : 1237);
-		result = prime * result + (valid ? 1231 : 1237);
-		temp = Double.doubleToLongBits(viewR);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		return result;
+	public void setBalloons(Collection<Balloon> balls) {
+		balloons = balls;
 	}
-
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Tower other = (Tower) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
-	}
-
 
 	public double getCooldown() {
 		return fireCooldown;
@@ -257,16 +214,19 @@ public abstract class Tower extends GameObject implements Cloneable{
 			
 			if (valid) {
 				g.setColor(new Color(100, 100, 100, 155));
-				g.fillOval((int) (getX() - viewR), (int) (getY() - viewR), (int)(2 * viewR), (int)(2 * viewR));
+				g.fillOval((int) (getX() - viewR), (int) (getY() - viewR), (int)(2 * viewR), 
+						(int)(2 * viewR));
 				g.setColor(new Color(255, 0, 0, 70));
-				g.fillOval((int) (getX() - blindR), (int) (getY() - blindR), (int)(2 * blindR), (int)(2 * blindR));	
+				g.fillOval((int) (getX() - blindR), (int) (getY() - blindR), (int)(2 * blindR), 
+						(int)(2 * blindR));	
 				g.setColor(c);
 				super.draw(g);
 			}
 			else {
 				super.draw(g);
 				g.setColor(new Color(255, 0, 0, 150));
-				g.fillOval((int) (getX() - viewR), (int) (getY() - viewR), (int)(2 * viewR), (int)(2 * viewR));
+				g.fillOval((int) (getX() - viewR), (int) (getY() - viewR), (int)(2 * viewR), 
+						(int)(2 * viewR));
 				g.setColor(c);
 			}
 			
@@ -282,7 +242,6 @@ public abstract class Tower extends GameObject implements Cloneable{
 		    try {
 				return super.clone();
 			} catch (CloneNotSupportedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		    return null;

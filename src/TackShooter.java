@@ -1,7 +1,4 @@
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -14,7 +11,6 @@ public class TackShooter extends Tower {
 	public TackShooter(double x, double y, Collection<Balloon> balloons) {
 		super(null, x, y, DataLoader.SCALE * viewRad, 0, 0.6, 305, "Tack Shooter", balloons);
 		setAnimation(generateImages(), 100);
-		// TODO Auto-generated constructor stub
 	}
 	
 
@@ -26,16 +22,18 @@ public class TackShooter extends Tower {
 		for (BufferedImage cannon : anim) {
 			BufferedImage base = res.getImage("tack_shooter_base");
 			BufferedImage logo = res.getImage("tack_shooter_tack_logo");
-			//BufferedImage cannon = res.getImage("tack_shooter_firing_01");
 			BufferedImage cannonMirror = ResourceManager.mirrorTB(cannon);
 			
-			BufferedImage img = new BufferedImage(cannonMirror.getWidth(), cannonMirror.getHeight(), base.getType());
+			BufferedImage img = new BufferedImage(cannonMirror.getWidth(), cannonMirror.getHeight(),
+					base.getType());
 			Graphics g = img.getGraphics();
 		
 		    g.drawImage(cannonMirror, 0, 0, null);
 
-			g.drawImage(base, img.getWidth() - base.getWidth(), img.getWidth() - base.getWidth(), null);
-			g.drawImage(logo, img.getWidth() - logo.getWidth(), img.getHeight() / 2 - logo.getHeight() / 2, null);
+			g.drawImage(base, img.getWidth() - base.getWidth(), img.getWidth() - base.getWidth(),
+					null);
+			g.drawImage(logo, img.getWidth() - logo.getWidth(),
+					img.getHeight() / 2 - logo.getHeight() / 2, null);
 			genAnim.add(ResourceManager.mirrorLR(img));
 		}
 
@@ -46,12 +44,6 @@ public class TackShooter extends Tower {
 	@Override
 	protected Collection<GameObject> fire(List<Balloon> intersect, int time) {
 		Collection<GameObject> ret = new LinkedList<>(); 
-//		double tx = target.getX();
-//		double ty = target.getY();
-//		Point t = target.getProjectedLocation(time);
-//		double tx = t.getX();
-//		double ty = t.getY();
-		//Tack dummy = new Tack(0, 0, 0, 0, null);
 		
 		double r = getViewRadius();
 		double x = getX();
@@ -68,7 +60,6 @@ public class TackShooter extends Tower {
 		ret.add(new Tack(x, y, x - rmod, y + rmod, balloons)); //SW
 		ret.add(new Tack(x, y, x - rmod, y - rmod, balloons)); //NW
 		
-		//align(tx, ty);
 		return ret;
 	}
 }

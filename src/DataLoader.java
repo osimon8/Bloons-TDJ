@@ -1,15 +1,16 @@
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.Writer;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,18 +18,9 @@ import java.util.Map;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-
 
 public class DataLoader {
 
@@ -181,6 +173,92 @@ public class DataLoader {
             return null;
         }
     }
+    
+    public static void saveData(Field field) throws IOException{
+    	File file = new File("files/data/saveFile.dat");
+    	file.createNewFile();
+    	Writer writ = new FileWriter(file);
+    	BufferedWriter w = new BufferedWriter(writ);
+    	
+    	int lvl = field.getLevel();
+    	if (field.inLevel())
+    		lvl--; //restart level if currently in a level
+    	
+    	w.write(lvl + "\n"); //write current level
+    	w.write(field.getMoney() + "\n"); //write money
+    	w.write(field.getLives() + "\n"); //write current lives
+    	
+    	for (Tower t : field.getTowers()) {
+        	w.write(t.getClass().toString() + ";" + t.getX() + ";" + t.getY() + "\n"); 
+        	//1 line per tower, "type;x;y" 
+    	}
+    	
+    	w.close();
+    	
+    }
+    
+    public static void loadData(Field field) throws IOException{
+    	File file = new File("files/data/saveFile.dat");
+    	Reader red = new FileReader(file);
+    	BufferedReader r = new BufferedReader(red);
+    	
+    	int level = Integer.parseInt(r.readLine().trim());
+    	int money = Integer.parseInt(r.readLine().trim());
+    	int lives = Integer.parseInt(r.readLine().trim());
+    	
+    	List<Tower> towers = new LinkedList<>();
+    	
+    	String currLine = r.readLine();
+
+    	while (currLine != null) {
+    		currLine = currLine.trim();
+    		Scanner sc = new Scanner(currLine);
+    		sc.useDelimiter(";");
+    		String type = sc.next();
+    		double x = sc.nextDouble();
+    		double y = sc.nextDouble();
+    		sc.close();
+    		
+    		switch (type) {
+    			case ("class DartMonkey"):
+    				towers.add(new DartMonkey(x, y, null));
+    				break;
+    			case ("class BombTower"):
+    				towers.add(new BombTower(x, y, null));
+    				break;
+    			case ("class TackShooter"):
+    				towers.add(new TackShooter(x, y, null));
+    				break;
+    			case ("class IceTower"):
+    				towers.add(new IceTower(x, y, null));
+    				break;
+    			case ("class SuperMonkey"):
+    				towers.add(new SuperMonkey(x, y, null));
+    				break;
+    			case ("class Spikes"):
+    				towers.add(new Spikes(x, y, null));
+    				break;
+    			case ("class Pineapple"):
+    				towers.add(new Pineapple(x, y, null));
+    				break;
+    			default:
+    				break;
+    		}
+
+    		currLine = r.readLine();
+    	}
+    	r.close();
+    	
+    	field.reset(level, money, lives);
+    	Collection<Balloon> balloons = field.getBalloons();
+    	
+    	for (Tower t : towers) {
+    		t.setBalloons(balloons);
+    	}
+    	field.setTowers(towers);
+    	
+    }
+    
 	
 
 }

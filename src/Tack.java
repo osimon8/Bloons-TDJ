@@ -1,5 +1,4 @@
 import java.awt.Polygon;
-import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;

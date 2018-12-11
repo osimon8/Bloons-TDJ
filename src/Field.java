@@ -12,21 +12,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 
-/**
- * GameCourt
- * 
- * This class holds the primary game logic for how different objects interact with one another. Take
- * time to understand how the timer interacts with the different methods and how it repaints the GUI
- * on every tick().
- */
 @SuppressWarnings("serial")
 public class Field extends JPanel {
 
@@ -57,11 +47,9 @@ public class Field extends JPanel {
     private Image background;
     long startTime;
     
-    // Game constants
-    public static int width = 300; //default values 
-    public static int height = 300;
+    public static int width;
+    public static int height;
 
-    // Update interval for timer, in milliseconds
     
     
     public static final int INTERVAL = 10; //16 is 60 UPS, slower computers need it be lower to keep up
@@ -72,14 +60,6 @@ public class Field extends JPanel {
     private Tower placingTower;
     
     public Field(JFrame f) {
-        // creates border around the court area, JComponent method
-        //setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
-        // The timer is an object which triggers an action periodically with the given INTERVAL. We
-        // register an ActionListener with this timer, whose actionPerformed() method is called each
-        // time the timer triggers. We define a helper method called tick() that actually does
-        // everything that should be done in a single timestep.
-
         this.frame  = f;
         this.money = 0;
         this.lives = 0;
@@ -87,12 +67,12 @@ public class Field extends JPanel {
         background = DataLoader.loadImage("files/Spinny.png");
         width = background.getWidth(null);
         height = background.getHeight(null);
+        //load background image and set size 
         
         try {
-			bloonPath = DataLoader.readPathData("spinny");
+			bloonPath = DataLoader.readPathData("spinny"); //load in path data
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e1.printStackTrace(); //This should never happen, if it does, the game can't be played
 		}
 
         ticker = new Timer(INTERVAL, new ActionListener() {
@@ -100,12 +80,18 @@ public class Field extends JPanel {
                 tick();
             }
         });
+        //initialize update loop
+        
     	bottomHUD = new JPanel();
     	rightHUD = new JPanel();
         
     	this.setLayout(new BorderLayout());
     	this.add(rightHUD, BorderLayout.EAST);
     	this.add(bottomHUD, BorderLayout.SOUTH);
+    	
+    	//add in HUDs
+    	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation(screenSize.width / 2 - width / 2, screenSize.height / 2 - height / 2);
     }
 
     private void place(MouseEvent e) {
@@ -136,7 +122,6 @@ public class Field extends JPanel {
     		if (!found) {
     			if (selectedTower != null) {
     				selectedTower.deselect();
-					//bottomHUD.removeAll();
     			}
     			selectedTower = null;
     		}
@@ -146,8 +131,14 @@ public class Field extends JPanel {
     /**
      * (Re-)set the game to its initial state.
      */
-    public void reset() {
-    	ticker.stop();
+    public void reset(int lvl, int mon, int lves) {
+
+    	//center on screen
+        
+        
+    	ticker.stop(); //stop update loop
+    	
+    	
     	moneyLabel = new JLabel();
     	livesLabel = new JLabel();
 
@@ -155,11 +146,11 @@ public class Field extends JPanel {
     	money = 0;
     	inLevel = false;
     	
-        changeMoney(500);
-        changeLives(200);
-        level = 0;
+        changeMoney(mon);
+        changeLives(lves);
+        level = lvl;
     	levelLabel = new JLabel();
-        levelLabel.setText("Level " + level + " /50");
+        levelLabel.setText("Level " + level + "/50");
     	
     	bottomHUD = new JPanel();
     	rightHUD = new JPanel();
@@ -168,13 +159,13 @@ public class Field extends JPanel {
     	
     	this.setLayout(new BorderLayout());
     	this.add(rightHUD, BorderLayout.EAST);
-    	this.add(bottomHUD, BorderLayout.SOUTH);
+    	this.add(bottomHUD, BorderLayout.SOUTH); //set up layout and labels and stuff
 
     	
         projectiles = new LinkedList<>();
         effects = new LinkedList<>();
         towers = new LinkedList<>();
-        balloons = new LinkedList<>();
+        balloons = new LinkedList<>(); //initialize collections of GameObjects
  
         
     	towerPriceLabel = new JLabel();
@@ -208,32 +199,29 @@ public class Field extends JPanel {
     	nextLevel = new JButton("Next Level");
     	nextLevel.setFont(nextLevel.getFont().deriveFont(30F));
     	levelLabel.setFont(levelLabel.getFont().deriveFont(50F));
-    	nextLevel.addActionListener(new ActionListener() {
-    		@Override
-    		public void actionPerformed(ActionEvent e) {
+    	nextLevel.addActionListener(e -> {
     			if (playing())
     				nextLevel();
     			else
-    				reset();
-    		}    		
+    				reset(0, 500, 200);  		
     	});
     	
     	bottomHUD.add(levelLabel);
     	bottomHUD.add(nextLevel);
     	
-
+    	//more labels and button setup and addition to HUDs
     	
     	JButton newMonkeyButton = new TowerButton(this, new DartMonkey(0, 0, balloons));
     	rightHUD.add(newMonkeyButton);
-        
-    	JButton newBombButton = new TowerButton(this, new BombTower(0, 0, balloons));
-    	rightHUD.add(newBombButton);
     	
     	JButton newTackButton = new TowerButton(this, new TackShooter(0, 0, balloons));
     	rightHUD.add(newTackButton);
     	
     	JButton newIceButton = new TowerButton(this, new IceTower(0, 0, balloons));
     	rightHUD.add(newIceButton);
+    	
+    	JButton newBombButton = new TowerButton(this, new BombTower(0, 0, balloons));
+    	rightHUD.add(newBombButton);
     	
     	JButton newSuperMonkeyButton = new TowerButton(this, new SuperMonkey(0, 0, balloons));
     	rightHUD.add(newSuperMonkeyButton);
@@ -252,8 +240,36 @@ public class Field extends JPanel {
     		changeMoney((int)(selectedTower.getPrice() * 0.75));
     		selectedTower = null;
     	});
-    	
+
     	rightHUD.add(sellButton);
+    	
+    	
+    	JButton saveButton = new JButton("Save");
+    	saveButton.setFont(saveButton.getFont().deriveFont(15F));
+    	saveButton.addActionListener(e -> {
+    			try {
+					DataLoader.saveData(this);
+				} catch (IOException e1) {
+					System.out.println("Data failed to save");
+					e1.printStackTrace();
+				}
+    	});
+    	
+    	rightHUD.add(saveButton);
+    	
+    	
+    	JButton loadButton = new JButton("Load");
+    	loadButton.setFont(loadButton.getFont().deriveFont(15F));
+    	loadButton.addActionListener(e -> {
+    			try {
+					DataLoader.loadData(this);
+				} catch (IOException e1) {
+					System.out.println("Data failed to load");
+					e1.printStackTrace();
+				}
+    	});
+    	
+    	rightHUD.add(loadButton);
     	
 		this.addMouseMotionListener(new MouseAdapter() {
 			@Override
@@ -306,28 +322,7 @@ public class Field extends JPanel {
         requestFocusInWindow();
         lastTime = System.currentTimeMillis();
         
-        
-        
-        
-        //Bloon[] bloons = Bloon.values();	
-        //Random r = new Random();
-        
-        //Field screen = this;
-        
-//        Timer timer = new Timer(250, new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//            	//Random Bloon gen
-//            	int n = r.nextInt(bloons.length);
-//            	
-//        	    Balloon b = new Balloon(bloons[n], bloonPath, screen);
-//        	    balloons.add(b);
-//        	    b.setPathPosition(0);
-//                //System.gc();
-//
-//            }
-//        });
-//        timer.start();
-     
+        //genRandomBloons();
         
         ticker.start();
         frame.validate();
@@ -427,7 +422,8 @@ public class Field extends JPanel {
         
         nextLevel.setEnabled(!inLevel);
         
-        if(selectedTower != null && !(selectedTower instanceof Spikes) && !(selectedTower instanceof Pineapple)) {
+        if(selectedTower != null && !(selectedTower instanceof Spikes) &&
+        		!(selectedTower instanceof Pineapple)) {
         	sellButton.setVisible(true);
         	sellButton.setText("Sell: $" + (int)(0.75 * selectedTower.getPrice()));
         }
@@ -562,6 +558,18 @@ public class Field extends JPanel {
     	return money;
     }
     
+    public int getLives() {
+    	return lives;
+    }
+    
+    public int getLevel() {
+    	return level;
+    }
+    
+    public boolean inLevel() {
+    	return inLevel;
+    }
+    
     public boolean playing() {
     	return playing;
     }
@@ -572,6 +580,42 @@ public class Field extends JPanel {
     
     public Tower getPlacing() {
     	return placingTower;
+    }
+    
+    public Collection<Tower> getTowers(){
+    	return towers;
+    }
+    
+    public Collection<Balloon> getBalloons(){
+    	return balloons;
+    }
+    
+    public void setTowers(List<Tower> twrs) {
+    	towers = twrs;
+    }
+    
+    @SuppressWarnings("unused")
+	private void genRandomBloons() {
+        
+        Bloon[] bloons = Bloon.values();	
+        Random r = new Random();
+        
+        Field screen = this;
+        
+        Timer timer = new Timer(250, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	//Random Bloon gen
+            	int n = r.nextInt(bloons.length);
+            	
+        	    Balloon b = new Balloon(bloons[n], bloonPath, screen);
+        	    balloons.add(b);
+        	    b.setPathPosition(0);
+
+            }
+        });
+        timer.start();
+     
+    	
     }
     
     @Override

@@ -1,5 +1,3 @@
-import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 
@@ -13,7 +11,8 @@ public abstract class Projectile extends GameObject{
 	private int velY;
 	private Collection<Balloon> balloons;
 	
-	public Projectile(BufferedImage img, double x, double y, int velX, int velY, Collection<Balloon> b) {
+	public Projectile(BufferedImage img, double x, double y, int velX, int velY, 
+			Collection<Balloon> b) {
 		super(img, x, y);
 		this.velX = velX;
 		this.velY = velY;

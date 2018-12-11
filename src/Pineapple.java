@@ -22,10 +22,12 @@ public class Pineapple extends Tower {
 		BufferedImage pineapple = res.getImage("pineapple");
 		genAnim.add(pineapple);
 		for (int i = 3; i >= 1; i--) {
-			BufferedImage img = new BufferedImage(pineapple.getWidth(), pineapple.getHeight(), pineapple.getType());
+			BufferedImage img = new BufferedImage(pineapple.getWidth(), pineapple.getHeight(),
+					pineapple.getType());
 			BufferedImage number = res.getImage("pineapple_text_0" + i);
 			img.getGraphics().drawImage(pineapple, 0, 0, null);
-			img.getGraphics().drawImage(number, (img.getWidth() - number.getWidth()) / 2 - 3, (img.getHeight() - number.getHeight()) * 2 / 3 + 5, null);
+			img.getGraphics().drawImage(number, (img.getWidth() - number.getWidth()) / 2 - 3, 
+					(img.getHeight() - number.getHeight()) * 2 / 3 + 5, null);
 			genAnim.add(img);
 		}
 		return genAnim;

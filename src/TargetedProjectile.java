@@ -1,9 +1,5 @@
-import java.awt.Image;
-import java.awt.Polygon;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 public class TargetedProjectile extends Projectile {
 	
@@ -11,7 +7,8 @@ public class TargetedProjectile extends Projectile {
 	private static final int BBOX_SCALE = 0;
 
 	
-	public TargetedProjectile(BufferedImage img, double x, double y, int speed, double targetX, double targetY, Collection<Balloon> b, double extra) {
+	public TargetedProjectile(BufferedImage img, double x, double y, int speed, double targetX,
+			double targetY, Collection<Balloon> b, double extra) {
 		super(img, x, y, b);
 		double dx = targetX - x;
 		double dy = targetY - y;

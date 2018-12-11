@@ -20,12 +20,12 @@ public class BombTower extends Tower {
 		List<BufferedImage> genAnim = new LinkedList<>();
 		for (BufferedImage body : anim) {
 			BufferedImage wheel = res.getImage("bomb_tower_wheel");
-			BufferedImage img = new BufferedImage(body.getWidth() + wheel.getWidth() - 2, body.getHeight(), body.getType());
+			BufferedImage img = new BufferedImage(body.getWidth() + wheel.getWidth() - 2, 
+					body.getHeight(), body.getType());
 			img.getGraphics().drawImage(body, wheel.getWidth() - 2, 0, null);
 			img.getGraphics().drawImage(wheel, 0, 1 * img.getHeight() / 4, null);
 			genAnim.add(ResourceManager.mirrorLR(img));
 		}
-		//BufferedImage body = res.getImage("bomb_tower_0");
 
 		return genAnim;
 	}
@@ -34,8 +34,6 @@ public class BombTower extends Tower {
 	protected Collection<GameObject> fire(List<Balloon> intersect, int time) {
 		Balloon target = selectTarget(intersect);
 		Collection<GameObject> ret = new LinkedList<>(); 
-//		double tx = target.getX();
-//		double ty = target.getY();
 		Point t = target.getProjectedLocation(time);
 		double tx = t.getX();
 		double ty = t.getY();

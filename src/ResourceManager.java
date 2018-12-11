@@ -1,4 +1,3 @@
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -59,10 +58,9 @@ public class ResourceManager {
 		if (data == null)
 			throw new IllegalArgumentException("Error - Sprite name \"" +  name + "\" not found");
 
-		BufferedImage img = inGame.getSubimage((int) (DataLoader.SCALE * data[0]), (int) (DataLoader.SCALE * data[1]), (int) (DataLoader.SCALE * data[2]), (int) (DataLoader.SCALE * data[3]));
-
-		
-		//use this for creating new image w/o reference to whole sprite sheet
+		BufferedImage img = inGame.getSubimage((int) (DataLoader.SCALE * data[0]), 
+				(int) (DataLoader.SCALE * data[1]), (int) (DataLoader.SCALE * data[2]), 
+				(int) (DataLoader.SCALE * data[3]));
 		
 		
 		return img;
@@ -76,15 +74,17 @@ public class ResourceManager {
 		//List<img>
 		
 		if (cells == null)
-			throw new IllegalArgumentException("Error - Animation name \"" +  name + "\" not found");
+			throw new IllegalArgumentException("Error - Animation name \"" + name + "\" not found");
 		
 		for (String cell : cells) {
 			int[] data = getSprite(cell);
 			
 			if (data == null)
-				throw new IllegalArgumentException("Error - Sprite name \"" +  name + "\" not found");
+				throw new IllegalArgumentException("Error - Sprite name \"" + name +"\" not found");
 
-			BufferedImage img = inGame.getSubimage((int) (DataLoader.SCALE * data[0]), (int) (DataLoader.SCALE * data[1]), (int) (DataLoader.SCALE * data[2]), (int) (DataLoader.SCALE * data[3]));
+			BufferedImage img = inGame.getSubimage((int) (DataLoader.SCALE * data[0]), 
+					(int) (DataLoader.SCALE * data[1]), (int) (DataLoader.SCALE * data[2]), 
+					(int) (DataLoader.SCALE * data[3]));
 			anim.add(img);
 
 		}
@@ -100,55 +100,32 @@ public class ResourceManager {
 	public static BufferedImage tint(BufferedImage image, Color color) {
 		BufferedImage copy = copy(image);
 		
-    	//float hue  = ( color.getRed() + color.getBlue() + color.getGreen())/ (255 * 3);
 		
 	    for (int x = 0; x < copy.getWidth(); x++) {
 	        for (int y = 0; y < copy.getHeight(); y++) {
 	            Color pixelColor = new Color(copy.getRGB(x, y), true);
-	            int r = (3 *pixelColor.getRed() + color.getRed()) / 4;
+	            int r = (3 * pixelColor.getRed() + color.getRed()) / 4;
 	            int g = (3 * pixelColor.getGreen() + color.getGreen()) / 4;
-	            int b = (3 *pixelColor.getBlue() + color.getBlue()) / 4;
+	            int b = (3 * pixelColor.getBlue() + color.getBlue()) / 4;
 	            int a = pixelColor.getAlpha();
 
 
 	            float[] hsb = Color.RGBtoHSB(r, g, b, null);
 	             
-	           //if (!color.equals(Color.BLACK))
 	            
-	            Color n = Color.getHSBColor(hsb[0], hsb[1] + (color.equals(Color.BLACK) ? 0 : 0.5F ), hsb[2]);
+	            Color n = Color.getHSBColor(hsb[0], hsb[1] + (color.equals(Color.BLACK) ? 0 : 0.5F),
+	            		hsb[2]);
 	            
 	            r = n.getRed();
 	            g = n.getGreen();
 	            b = n.getBlue();
 	            
-	            int rgba = (a << 24) | (r << 16) | (g << 8) | b; //not sure exactly how this works, shifts over bits to form integer representing argb values
+	            int rgba = (a << 24) | (r << 16) | (g << 8) | b; 
+	            //not sure exactly how this works, shifts over bits to form integer representing argb values
+	            //I looked this up to figure out how to convert r,g,b,a values to a color
 	            
 	            copy.setRGB(x, y, rgba);
 	            
-//	            if (pixelColor.) {
-//		            int r = color.getRed();
-//		            int g = color.getGreen();
-//		            int b = color.getBlue();
-//		        	int a = pixelColor.getAlpha();
-//		            int rgba = (a << 24) | (r << 16) | (g << 8) | b;
-//		        	copy.setRGB(x, y, rgba);
-//	            }
-	            	
-	        	
-//	            float[] hsb = Color.RGBtoHSB(pixelColor.getRed(), pixelColor.getGreen(), pixelColor.getBlue(), null);
-//	            System.out.println("" + hsb[0] + " " + hsb[1] + " " + hsb[2]);
-//	        	Color n = Color.getHSBColor(hsb[0], hsb[1] + 1F, hsb[2]);
-//	        	
-//	        	int r = n.getRed();
-//	        	int g = n.getBlue();
-//	        	int b = n.getGreen();
-//	        	int a = pixelColor.getAlpha();
-//	        	
-//	        	int rgba = (a << 24) | (r << 16) | (g << 8) | b;
-
-	        	
-	        	
-	        	
 	        }
 	    }
 	    
@@ -156,7 +133,8 @@ public class ResourceManager {
 	}
 	
 	public static BufferedImage copy(Image img) {
-		BufferedImage copy = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage copy = new BufferedImage(img.getWidth(null), img.getHeight(null),
+				BufferedImage.TYPE_INT_ARGB);
 		Graphics gc = copy.createGraphics();
 		gc.drawImage(img, 0, 0, null);
 		return copy;
@@ -178,7 +156,8 @@ public class ResourceManager {
 		
 	}
 	
-	public static BufferedImage scaleImage(BufferedImage original, double widthFactor, double heightFactor) {
+	public static BufferedImage scaleImage(BufferedImage original, double widthFactor, 
+			double heightFactor) {
 		
 		int newWidth = new Double(original.getWidth() * widthFactor).intValue();
 		int newHeight = new Double(original.getHeight() * heightFactor).intValue();
@@ -188,7 +167,8 @@ public class ResourceManager {
 	}
 	
 	public static BufferedImage mirrorLR(BufferedImage img) {
-		BufferedImage mirrored = new BufferedImage(img.getWidth() * 2, img.getHeight(), img.getType());
+		BufferedImage mirrored = new BufferedImage(img.getWidth() * 2, img.getHeight(), 
+				img.getType());
 		Graphics g = mirrored.getGraphics();
 		g.drawImage(img, 0, 0, null);
 		g.drawImage(img, 2 * img.getWidth(), 0, -img.getWidth(), img.getHeight(), null);
@@ -196,7 +176,8 @@ public class ResourceManager {
 	}
 	
 	public static BufferedImage mirrorTB(BufferedImage img) {
-		BufferedImage mirrored = new BufferedImage(img.getWidth(), img.getHeight() * 2, img.getType());
+		BufferedImage mirrored = new BufferedImage(img.getWidth(), img.getHeight() * 2, 
+				img.getType());
 		Graphics g = mirrored.getGraphics();
 		g.drawImage(img, 0, 0, null);
 		g.drawImage(img, 0, img.getHeight() * 2, img.getWidth(), -img.getHeight(), null);

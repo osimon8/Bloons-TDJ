@@ -1,15 +1,11 @@
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
-
-
 
 public class Balloon extends GameObject implements Comparable<Balloon>{
 	
@@ -45,12 +41,6 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 		type = b;
 		field = f;
 		setUp();
-		
-		
-//		if (hp <= 5)
-//			setStockBloon();
-		
-		// TODO Auto-generated constructor stub
 	}
 	
 	public Balloon(Bloon b, Point[] path, int pos, Field f) {
@@ -60,12 +50,6 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 		type = b;
 		field = f;
 		setUp();
-
-		
-//		if (hp <= 5)
-//			setStockBloon();
-		
-		// TODO Auto-generated constructor stub
 	}
 	
 	private static BufferedImage getStockBloonImage(Color c) {
@@ -261,23 +245,8 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	public int damage(int dmg) {
 		hp -= dmg;
 		refreshImage = true;
-		
-//		if (hp < 1) {
-//			pop();
-//			return 0;
-//		}
-		
-//		if (hp <= 5)
-//			setStockBloon();
-		
 		return hp;
 	}
-	
-	public void pop() {
-		flagForDeath();
-		//increment money by hp * scale
-	}
-	
 	
 	public void setPathPosition(int pos) {
 		pathPosition = pos;
@@ -292,10 +261,7 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	public Collection<GameObject> update(int time) {
 		List<GameObject> ret = null;
 		
-		
 		if (hp < 1) {
-			//animate pop
-			//return death balloons
 			ret = new LinkedList<>();
 			ret.add(Effect.makePop(getX(), getY()));
 			for (GameObject o : getChildren())
@@ -305,13 +271,8 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 			return ret;
 		}
 			
-		
-		
-		if (alive()) {
-			
 
-			
-			//int ctr = 0;
+		if (alive()) {
 			
 			if (frozen()) {
 				freezeTimer -= time;
@@ -319,8 +280,10 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 				if (refreshImage) {
 					BufferedImage base = getBloonImage(type);
 					BufferedImage ice = ResourceManager.getInstance().getImage("ice_effect");
-					BufferedImage img = new BufferedImage(ice.getWidth(), ice.getHeight(), ice.getType());
-					img.getGraphics().drawImage(base, (img.getWidth() - base.getWidth()) / 2 , (img.getHeight() - base.getHeight()) / 2 , null);
+					BufferedImage img = new BufferedImage(ice.getWidth(), ice.getHeight(), 
+							ice.getType());
+					img.getGraphics().drawImage(base, (img.getWidth() - base.getWidth()) / 2 , 
+							(img.getHeight() - base.getHeight()) / 2 , null);
 					img.getGraphics().drawImage(ice, 0, 0, null);
 					setImage(img);
 					refreshImage = false;
@@ -346,13 +309,10 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 					move(p.getX(), p.getY());
 					dist -= p.distance(path[pathPosition]);
 					pathPosition++;
-					//ctr ++;
 				}
-				
-				//System.out.println(type + ": " + ctr);
+
 				
 				if (pathPosition == path.length - 1) {
-					//decrement life by hp * scale
 					flagForDeath();
 					field.changeLives(-calculateRBE());
 				}
@@ -367,20 +327,18 @@ public class Balloon extends GameObject implements Comparable<Balloon>{
 	public int calculateRBE(){
 		int rbe = hp;
 		for (Balloon b : this.getChildren())
-			rbe += b.calculateRBE();
+			rbe += b.calculateRBE(); //recursively evaluate rbe by checking it of children
 		return rbe;
 	}
 	
 	public Point getProjectedLocation(int time) {
-		return path[Math.min(path.length - 1, pathPosition + (int)(25 * time * speed / (Balloon.RED_SPEED * 18)))];
+		return path[Math.min(path.length - 1, 
+				pathPosition + (int)(25 * time * speed / (Balloon.RED_SPEED * 18)))];
 	}
 	
 
 	@Override
 	public int compareTo(Balloon b) {
-//		int val = b.getHP() - hp;
-//		if (val != 0)
-//			return val;
 		int pathDiff = pathPosition - b.pathPosition;
 		if (pathDiff == 0)
 			return this == b ? 0 : 1;

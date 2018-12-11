@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 
 public class PathTraceUtility {
 
-	private JPanel screen;
 	private boolean tracing;
 	private boolean active;
 	private String filename;
@@ -22,7 +21,6 @@ public class PathTraceUtility {
 	
 	public PathTraceUtility(JPanel screen, String filename) {
 		// TODO Auto-generated constructor stub
-		this.screen = screen;
 		tracing = false;
 		active = false;
 		this.filename = filename;

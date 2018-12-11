@@ -25,7 +25,8 @@ public class Effect extends GameObject {
 	}
 	
 	public static Effect makeIceExplosion(double x, double y) {
-		return new Effect(ResourceManager.getInstance().getAnimation("ice_explosion"), x, y, 0.75, 60);
+		return new Effect(ResourceManager.getInstance().getAnimation("ice_explosion"), x, y, 0.75, 
+				60);
 	}
 	
 	@Override

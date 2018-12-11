@@ -10,8 +10,8 @@ public class Spikes extends Tower {
 	private String last = "";
 	
 	public Spikes(double x, double y, Collection<Balloon> balloons) {
-		super(getStartImage(), x, y, getStartImage().getWidth() / 2, 0, 1000000, 25, "Road Spikes", balloons);
-		// TODO Auto-generated constructor stub
+		super(getStartImage(), x, y, getStartImage().getWidth() / 2, 0, 1000000, 25, 
+				"Road Spikes", balloons);
 	}
 
 	private static BufferedImage getStartImage() {
